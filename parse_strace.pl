@@ -22,10 +22,8 @@ my $lasttime = undef;
 while (<$fd>) {
     print "raw: $_" if $DEBUG > 8;
     if (m{^(\d{2}:\d{2}:\d{2})(\.\d{3})\d* }) {
-        if (!defined($lasttime)) {
-          $lasttime = "$1$2";
-          print "Timestamp is now = $lasttime\n" if $DEBUG > 6;
-        }
+        $lasttime = "$1$2";
+        print "Timestamp is now = $lasttime\n" if $DEBUG > 6;
         next;
     }
     next if (m{^\)});				# ignore end of syscall lines
@@ -44,7 +42,6 @@ while (<$fd>) {
           # SLCLog.gp2 format is like:
           # 21/06/2014 11:56:56.563 (0) A0 A2 00 0C FF 41 53 49 43 3A 20 47 53 44 34 54 03 DF B0 B3
           print "00/00/0000 $lasttime (0) $packet\n";
-          $lasttime = undef;
       }
     } else {
       die "unknown format for line: $_";
