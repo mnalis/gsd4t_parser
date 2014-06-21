@@ -1,13 +1,14 @@
 #!/usr/bin/perl -w
 # by Matija Nalis <mnalis-android@voyager.hr> GPLv3+, started 2014-06-21
 # parse SLCLog.gp2 created by GSD4t on Samsung Galaxy S2 running CyanogenMod9
+#
+# Usage: ./parse_gp2.pl data/2/SLCLog.gp2
+#
 use strict;
 use autodie;
 use feature "switch";
 
 my $DEBUG = 2;
-my $IN = 'data/2/SLCLog.gp2';
-open my $fd, '<', $IN;
 
 # format is like:
 # 21/06/2014 00:02:23.287 (0) A0 A2 00 0C FF 41 53 49 43 3A 20 47 53 44 34 54 03 DF B0 B3 
@@ -18,7 +19,7 @@ open my $fd, '<', $IN;
 # 03 DF -- plain checksum (MID + payload)
 # B0 B3 -- leadout
 
-while (<$fd>) {
+while (<>) {
   if (m{^(\d{2}/\d{2}/\d{4}) (\d{2}:\d{2}:\d{2})(\.\d{3}) \(0\) A0 A2 ([A-F0-9 ]+) B0 B3\s*}) {
     print "raw: $_" if $DEBUG > 8;
     my $date = $1; my $time = $2; my $msec=$3; 
