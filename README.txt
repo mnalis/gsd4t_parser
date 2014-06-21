@@ -69,8 +69,10 @@ A0 A2 -- lead-in
 00 -- always zero? or 3rd (MSB) byte of sequence1?
 03 DE -- sequence1 (fast, ALMOST always incrementing, except on short commands ending with FF FF)
 00 9E -- sequence2 (slow, same for group of commands, and then increment by one)
-00 -- size? 0 if fits in initial 256-byte block, otherwise number of additional 256-byte blocks (1 or 3 usually, sometimes 2)
-00 CE D2 FF FF -- ?????? some stuff and payload
+00 00 -- size. MSB first. size of full packet (A0A2...B0B3) less 15 bytes (for headers?)
+CE D2 -- CRC16 (modbus) [everything after A0A2 up to checksum] -- see http://www.lammertbies.nl/comm/info/crc-calculation.html
+         but only for short (15-byte) packet
+FF FF -- ?????? actual payload/fill-in? 
 B0 B3 -- lead-out
 
 some of the unknown stuff seems to be sequences of some kind:
