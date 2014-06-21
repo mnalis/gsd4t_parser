@@ -9,7 +9,7 @@ use autodie;
 $| = 1;
 
 my $DEBUG = 2;
-my $IN = 'data/strace3/strace.log.3382';
+my $IN = 'data/strace4/strace.log.3491';
 open my $fd, '<', $IN;
 
 # strace format is like:
