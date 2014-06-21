@@ -6,7 +6,9 @@
 use strict;
 use autodie;
 
-my $DEBUG = 4;
+$| = 1;
+
+my $DEBUG = 9;
 my $IN = 'data/strace3/strace.log.3382';
 open my $fd, '<', $IN;
 
@@ -37,14 +39,15 @@ undef $log;
 
 
 # SLCLog.gp2 format is like:
-# 21/06/2014 11:56:56.563 (0) A0 A2 00 0C FF 41 53 49 43 3A 20 47 53 44 34 54 03 DF B0 B3 
+# 21/06/2014 11:56:56.563 (0) A0 A2 00 0C FF 41 53 49 43 3A 20 47 53 44 34 54 03 DF B0 B3
 
 my $seen_eol1 = 0;
 my $seen_eol2 = 1;
-while (my $x = uc(shift @data)) {
+while (my $x = shift @data) {
+  $x = uc($x);
   if ($seen_eol2) {
       $seen_eol2 = 0;
-      print "xxxxxxx header FIXME ";
+      print "00/00/0000 00:00:00.000 (0) ";
   }
   
   print "$x ";
@@ -54,7 +57,7 @@ while (my $x = uc(shift @data)) {
       print "\n";
       $seen_eol2 = 1;
     } else {
-      die "invalid second terminator, expected b3 got $x";
+      warn "invalid second terminator, expected B3 got $x" if $DEBUG > 2;
     }
   }
   
