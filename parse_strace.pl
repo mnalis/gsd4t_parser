@@ -39,9 +39,11 @@ while (<$fd>) {
           $packet =~ s/\s{2,}/ /g;
           $packet =~ s/^\s+//;
 
+          my $packet2 = $packet; $packet2 =~ s/\s//g;
+          my $size = sprintf "%4x", (length $packet2) / 2;
           # SLCLog.gp2 format is like:
           # 21/06/2014 11:56:56.563 (0) A0 A2 00 0C FF 41 53 49 43 3A 20 47 53 44 34 54 03 DF B0 B3
-          print "00/00/0000 $lasttime (0) $packet\n";
+          print "00/00/0000 $lasttime ($size) $packet\n";
       }
     } else {
       die "unknown format for line: $_";
