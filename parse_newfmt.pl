@@ -37,6 +37,7 @@ while (<>) {
 #### byte 0 (always 00) ####
     my $p_lead_zero = shift @data; 
     if ($p_lead_zero ne '00') { die "leading zero not 00 but $p_lead_zero in $_" }
+    print "  lead 00 -- OK\n" if $DEBUG > 7;
 
 #### byte 1-2 (sequence1) ####
     my $p_seq1 = (shift @data) . (shift @data);
@@ -45,6 +46,7 @@ while (<>) {
         # FIXME: allow seq1 to stay the same if we're null packet?
         # FIXME: allow wraparound
         if ($seq1 != $last_seq1 + 1) { die "last seq1 was $last_seq2, didn't expect $seq1 in $_" }	
+        print "  seq1 $last_seq1 + 1 = $seq1 -- OK\n" if $DEBUG > 7;
     }
     $last_seq1 = $seq1;
     
@@ -55,21 +57,30 @@ while (<>) {
     if (defined $last_seq2) {
         # FIXME: allow wraparound
         if (($seq2 != $last_seq2 + 1) and ($seq2 != $last_seq2)) { die "last seq2 was $last_seq2, didn't expect $seq2 in $_" }	
+        print "  seq2 $last_seq2 + 0/1 = $seq2 -- OK\n" if $DEBUG > 7;
     }
     $last_seq2 = $seq2;
 
 
 #### byte 5-6 (payload length) ####
     my $p_length = (shift @data) . (shift @data);	# FIXME verify after length is lead-out
-    
+    my $length = hex($p_length);
+    print "  packet length = 0x$p_length ($length)\n" if $DEBUG > 7;
+        
 #### byte 7-8 (header CRC-16) ####
     my $p_crc_head = (shift @data) . (shift @data);	# FIXME verify checksum
-    
+    my $crc_head = hex($p_crc_head);
+    print "  header CRC16 = 0x$p_crc_head ($crc_head)\n" if $DEBUG > 7;
+
 #### byte 9-xxx (actual payload) ####
     my $p_payload = '';	# FIXME extract $length amount of bytes
+    print "  payload ==> $p_payload\n" if $DEBUG > 7;
     
 #### byte xxx+1 and xxx+1 (payload CRC16) ####
     my $p_crc_payload = (shift @data) . (shift @data);	# FIXME verify checksum (also test if we get 'FFFF' on null-packet)
+    my $crc_payload = hex($p_crc_payload);
+    print "  payload CRC16 = 0x$p_crc_payload ($crc_payload)\n" if $DEBUG > 7;
+
 
     # FIXME verify rest of the packet is empty    
 
