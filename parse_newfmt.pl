@@ -22,6 +22,9 @@ my $DEBUG = 9;
 # F7 C9 -- CRC16 (modbus) of payload
 # B0 B3 -- lead-out
 
+my $last_seq1 = undef;
+my $last_seq2 = undef;
+
 while (<>) {
   if (m{^(\d{2}/\d{2}/\d{4}) (\d{2}:\d{2}:\d{2})(\.\d{3}) \(0\) A0 A2 ([A-F0-9 ]+) B0 B3\s*}) {
     print "raw: $_" if $DEBUG > 8;
@@ -31,15 +34,43 @@ while (<>) {
     my $date = $1; my $time = $2; my $msec=$3; 
     my @data = split ' ', $4;
 
+#### byte 0 (always 00) ####
     my $p_lead_zero = shift @data; 
     if ($p_lead_zero ne '00') { die "leading zero not 00 but $p_lead_zero in $_" }
 
-    my $p_seq1 = (shift @data) . (shift @data);	#FIXME verify it goes by +1
+#### byte 1-2 (sequence1) ####
+    my $p_seq1 = (shift @data) . (shift @data);
+    my $seq1 = hex($p_seq1);
+    if (defined $last_seq1) {
+        # FIXME: allow seq1 to stay the same if we're null packet?
+        # FIXME: allow wraparound
+        if ($seq1 != $last_seq1 + 1) { die "last seq1 was $last_seq2, didn't expect $seq1 in $_" }	
+    }
+    $last_seq1 = $seq1;
+    
+    
+#### byte 3-4 (sequence2) ####
     my $p_seq2 = (shift @data) . (shift @data);	#FIXME verify it is same or goes by +1
+    my $seq2 = hex($p_seq2);
+    if (defined $last_seq2) {
+        # FIXME: allow wraparound
+        if (($seq2 != $last_seq2 + 1) and ($seq2 != $last_seq2)) { die "last seq2 was $last_seq2, didn't expect $seq2 in $_" }	
+    }
+    $last_seq2 = $seq2;
+
+
+#### byte 5-6 (payload length) ####
     my $p_length = (shift @data) . (shift @data);	# FIXME verify after length is lead-out
+    
+#### byte 7-8 (header CRC-16) ####
     my $p_crc_head = (shift @data) . (shift @data);	# FIXME verify checksum
+    
+#### byte 9-xxx (actual payload) ####
     my $p_payload = '';	# FIXME extract $length amount of bytes
-    my $p_crc_payload = (shift @data) . (shift @data);	# FIXME verify checksum
+    
+#### byte xxx+1 and xxx+1 (payload CRC16) ####
+    my $p_crc_payload = (shift @data) . (shift @data);	# FIXME verify checksum (also test if we get 'FFFF' on null-packet)
+
     # FIXME verify rest of the packet is empty    
 
     print "  $time $p_payload\n" if $DEBUG > 3;
