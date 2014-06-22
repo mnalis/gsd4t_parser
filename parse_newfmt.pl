@@ -6,8 +6,23 @@
 #
 use strict;
 use autodie;
+use Digest::CRC;
 
 my $DEBUG = 9;
+
+sub crc16($)
+{
+  my ($input) = @_;
+  my $ctx = Digest::CRC->new(width=>16, init=>0xffff, refout=>1, poly=>0x8005, refin=>1, xorout=>0x0000, cont=>0);	# params for crc16-modbus
+
+  $input =~ s/\s+//g;
+  my $bin = pack 'H*', $input;	# convert ASCII HEX values to raw binary
+
+  $ctx->add($bin);
+  my $ret = uc($ctx->hexdigest);
+  print "   calculating crc16_modbus($input) = 0x$ret\n" if $DEBUG > 7;
+  return hex($ret);
+}
 
 # format is like:
 # 21/06/2014 00:02:23.287 (0)  A0 A2 00 03 E4 00 9F 00 14 04 5B 8E 02 03 01 43 03 71 00 00 00 00 00 00 00 00 00 00 00 00 00 F7 C9 B0 B3
@@ -69,9 +84,11 @@ while (<>) {
     print "  payload length = $length (0x$p_length)\n" if $DEBUG > 7;
         
 #### byte 7-8 (header CRC-16) ####
-    my $p_crc_head = (shift @data) . (shift @data);	# FIXME verify checksum
+    my $p_crc_head = (shift @data) . (shift @data);
     my $crc_head = hex($p_crc_head);
     print "  header CRC16 = $crc_head (0x$p_crc_head)\n" if $DEBUG > 7;
+    my $crc_head_verify = crc16("$p_lead_zero $p_seq1 $p_seq2 $p_length");
+    if ($crc_head != $crc_head_verify) { die "CRC header mismatch $crc_head != $crc_head_verify in $_" }
 
 #### byte 9-xxx (actual payload) ####
     my $p_payload = '';
@@ -84,12 +101,15 @@ while (<>) {
     print "  payload ==> $p_payload\n" if $DEBUG > 7;
     
 #### byte xxx+1 and xxx+1 (payload CRC16) ####
-    my $p_crc_payload = (shift @data) . (shift @data);	# FIXME verify checksum (also test if we get 'FFFF' on null-packet)
+    my $p_crc_payload = (shift @data) . (shift @data);
     my $crc_payload = hex($p_crc_payload);
     print "  payload CRC16 = $crc_payload (0x$p_crc_payload)\n" if $DEBUG > 7;
+    my $crc_payload_verify = crc16($p_payload);
+    if ($crc_payload != $crc_payload_verify) { die "CRC payload mismatch $crc_payload != $crc_payload_verify in $_" }
 
 #### end of packet ####
     if (@data) { die "done processing packet, but there is still data remaining in it: @_" }
+    print "--end packet--\n\n" if $DEBUG > 7;
 
     print " $time $p_payload\n" if $DEBUG > 3;
 
