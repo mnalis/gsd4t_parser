@@ -27,6 +27,8 @@ while (<$fd>) {
         next;
     }
     next if (m{^\)});				# ignore end of syscall lines
+    next if /^\s*$/;				# skip empty lines
+    next if /^\s*#//;				# skip comment lines
     
     if (m{^\s+\|\s+[a-f0-9]+\s+(([a-f0-9]{2} ){1,8}( ([a-f0-9]{2} ){1,8}\s)?)}) {
       print "Start of hex $1\n" if $DEBUG > 5;

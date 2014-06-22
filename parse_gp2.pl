@@ -20,6 +20,8 @@ my $DEBUG = 2;
 # B0 B3 -- leadout
 
 while (<>) {
+  next if /^\s*$/;	# skip empty lines
+  next if /^\s*#//;	# skip comment lines
   if (m{^(\d{2}/\d{2}/\d{4}) (\d{2}:\d{2}:\d{2})(\.\d{3}) \(0\) A0 A2 ([A-F0-9 ]+) B0 B3\s*}) {
     print "raw: $_" if $DEBUG > 8;
     my $date = $1; my $time = $2; my $msec=$3; 
