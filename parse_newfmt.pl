@@ -41,10 +41,10 @@ my $last_seq1 = undef;
 my $last_seq2 = undef;
 
 while (<>) {
+  next if /^\s*$/;	# skip empty lines
+  next if /^\s*#/;	# skip comment lines
   if (m{^(\d{2}/\d{2}/\d{4}) (\d{2}:\d{2}:\d{2})(\.\d{3}) \(0\) A0 A2 ([A-F0-9 ]+) B0 B3\s*}) {
     print "raw: $_" if $DEBUG > 8;
-    next if /^\s*$/;	# skip empty lines
-    next if /^\s*#/;	# skip comment lines
 
     my $date = $1; my $time = $2; my $msec=$3; 
     my @data = split ' ', $4;
@@ -62,7 +62,7 @@ while (<>) {
         # FIXME: allow wraparound
         if ($seq1 != $last_seq1 + 1) { die "last seq1 was $last_seq2, didn't expect $seq1 in $_" }	
     }
-    $last_seq1 |= 'undef'; print "  seq1 $last_seq1 + 1 = $seq1 (0x$p_seq1) -- OK\n" if $DEBUG > 7;
+    $last_seq1 ||= 'undef'; print "  seq1 $last_seq1 + 1 = $seq1 (0x$p_seq1) -- OK\n" if $DEBUG > 7;
     $last_seq1 = $seq1;
     
     
@@ -74,7 +74,7 @@ while (<>) {
         # FIXME: allow wraparound
         if (($seq2 != $last_seq2 + 1) and ($seq2 != $last_seq2)) { die "last seq2 was $last_seq2, didn't expect $seq2 in $_" }	
     }
-    $last_seq2 |= 'undef'; print "  seq2 $last_seq2 + 0/1 = $seq2 (0x$p_seq2) -- OK\n" if $DEBUG > 7;
+    $last_seq2 ||= 'undef'; print "  seq2 $last_seq2 + 0/1 = $seq2 (0x$p_seq2) -- OK\n" if $DEBUG > 7;
     $last_seq2 = $seq2;
 
 
@@ -116,5 +116,5 @@ while (<>) {
   } else {
     die "unknown format for line: $_";
   }
-  die;	# FIXME - test just first line
+  #die;	# FIXME - test just first line
 }
