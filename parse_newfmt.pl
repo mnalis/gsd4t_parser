@@ -17,9 +17,9 @@ my $DEBUG = 9;
 # 03E4  -- sequence1
 # 009F  -- sequence2
 # 0014  -- length of payload (length of full packet minus 0xf [full size of all headers]
-# 045B  -- CRC16 (modbus) of headers (OK!)
+# 045B  -- CRC16 (modbus) of headers
 # 8E 02 03 01 43 03 71 00 00 00 00 00 00 00 00 00 00 00 00 00 -- actual payload (FIXME - what is in it?)
-# F7 C9 -- CRC16 (modbus) of payload (OK!)
+# F7 C9 -- CRC16 (modbus) of payload
 # B0 B3 -- lead-out
 
 while (<>) {
@@ -31,18 +31,18 @@ while (<>) {
     my $date = $1; my $time = $2; my $msec=$3; 
     my @data = split ' ', $4;
 
-    my $lead_zero = shift @data; 
-    if ($lead_zero ne '00') { die "leading zero not 00 but $lead_zero in $_" }
+    my $p_lead_zero = shift @data; 
+    if ($p_lead_zero ne '00') { die "leading zero not 00 but $p_lead_zero in $_" }
 
-    my $seq1 = (shift @data) . (shift @data);	#FIXME verify it goes by +1
-    my $seq2 = (shift @data) . (shift @data);	#FIXME verify it is same or goes by +1
-    my $payload_length = (shift @data) . (shift @data);	# FIXME verify after length is lead-out
-    my $crc_head = (shift @data) . (shift @data);	# FIXME verify checksum
-    my $payload = '';	# FIXME extract $length amount of bytes
-    my $crc_payload = (shift @data) . (shift @data);	# FIXME verify checksum
+    my $p_seq1 = (shift @data) . (shift @data);	#FIXME verify it goes by +1
+    my $p_seq2 = (shift @data) . (shift @data);	#FIXME verify it is same or goes by +1
+    my $p_length = (shift @data) . (shift @data);	# FIXME verify after length is lead-out
+    my $p_crc_head = (shift @data) . (shift @data);	# FIXME verify checksum
+    my $p_payload = '';	# FIXME extract $length amount of bytes
+    my $p_crc_payload = (shift @data) . (shift @data);	# FIXME verify checksum
     # FIXME verify rest of the packet is empty    
 
-    print "  $time $payload\n" if $DEBUG > 3;
+    print "  $time $p_payload\n" if $DEBUG > 3;
 
   } else {
     die "unknown format for line: $_";
