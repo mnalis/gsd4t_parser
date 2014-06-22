@@ -4,3 +4,7 @@ which does not use regular SiRF binary protocol, but some new variant, which is 
 
 The aim of this project is to create helpful scripts and instructions to help reverse engineer the new protocol, 
 and make a converter to regular SiRF binary protocol (or NMEA).
+
+Latest version can be found at <A HREF="https://github.com/mnalis/gsd4t_parser.git">GitHub</A>
+
+You may also be interested in <A HREF="https://github.com/mnalis/gsd4t_logs.git">sample logs</A> if you lack your own...
