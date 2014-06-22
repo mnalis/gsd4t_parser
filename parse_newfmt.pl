@@ -52,7 +52,8 @@ while (<>) {
     
     
 #### byte 3-4 (sequence2) ####
-    my $p_seq2 = (shift @data) . (shift @data);	#FIXME verify it is same or goes by +1
+    my $p_seq2 = (shift @data) . (shift @data);	
+    # FIXME see what is it for? groupig of commands/session?
     my $seq2 = hex($p_seq2);
     if (defined $last_seq2) {
         # FIXME: allow wraparound
@@ -63,7 +64,7 @@ while (<>) {
 
 
 #### byte 5-6 (payload length) ####
-    my $p_length = (shift @data) . (shift @data);	# FIXME verify after length is lead-out
+    my $p_length = (shift @data) . (shift @data);	# FIXME verify that after length there is lead-out
     my $length = hex($p_length);
     print "  payload length = $length (0x$p_length)\n" if $DEBUG > 7;
         
