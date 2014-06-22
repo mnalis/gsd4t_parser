@@ -60,7 +60,7 @@ while (<>) {
     if (defined $last_seq1) {
         # FIXME: allow seq1 to stay the same if we're null packet?
         # FIXME: allow wraparound
-        if ($seq1 != $last_seq1 + 1) { die "last seq1 was $last_seq2, didn't expect $seq1 in $_" }	
+        if ($seq1 != $last_seq1 + 1) { die "last seq1 was $last_seq1, didn't expect $seq1 in $_" }	
     }
     $last_seq1 ||= 'undef'; print "  seq1 $last_seq1 + 1 = $seq1 (0x$p_seq1) -- OK\n" if $DEBUG > 7;
     $last_seq1 = $seq1;
