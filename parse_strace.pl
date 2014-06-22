@@ -2,24 +2,22 @@
 # by Matija Nalis <mnalis-android@voyager.hr> GPLv3+, started 2014-06-21
 # parse strace.log created by "strace -e trace=open,read,write -e write=275 -e read=275 -tt -v -ff -o strace.log  -p 2029"
 # and output it in SLCLog.gp2 alike format
-
+#
+# Usage: ./parse_strace.pl data/strace4/strace.log.3491
 use strict;
 use autodie;
 
 $| = 1;
 
 my $DEBUG = 2;
-my $IN = 'data/strace4/strace.log.3491';
-open my $fd, '<', $IN;
 
 # strace format is like:
 #12:02:02.092977 read(275, " ¢\0\4Ò\1\t\0L\235rá\n\24#\10", 2000) = 16
 # | 00000  a0 a2 00 04 d2 01 09 00  4c 9d 72 e1 0a 14 23 08   ¢..Ò... L.rá..#. |
 
-
 my $last_hex = '';
 my $lasttime = undef;
-while (<$fd>) {
+while (<>) {
     print "raw: $_" if $DEBUG > 8;
     if (m{^(\d{2}:\d{2}:\d{2})(\.\d{3})\d* }) {
         $lasttime = "$1$2";
