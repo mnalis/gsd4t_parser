@@ -77,6 +77,7 @@ while (<>) {
 
 
 #### byte 5-6 (payload length) ####
+    # FIXME: sometimes wrong on bigger packets?? check
     my $p_length = (shift @data) . (shift @data);
     my $length = hex($p_length);
     print "  payload length = $length (0x$p_length)\n" if $DEBUG > 7;
