@@ -45,7 +45,7 @@ while (<>) {
           print "   size=$size\n" if $DEBUG > 3;
           # SLCLog.gp2 format is like:
           # 21/06/2014 11:56:56.563 (0) A0 A2 00 0C FF 41 53 49 43 3A 20 47 53 44 34 54 03 DF B0 B3
-          print "00/00/0000 $lasttime (0) $packet\n";
+          print "00/00/0005 $lasttime (0) $packet\n";
       }
     } else {
       die "unknown format for line: $_";

@@ -8,7 +8,7 @@ use strict;
 use autodie;
 use Digest::CRC;
 
-my $DEBUG = 9;
+my $DEBUG = 3;
 $|=1;
 
 sub crc16($)
@@ -107,7 +107,7 @@ while (<>) {
     while ($cnt--) {
       my $byte = shift @data;
       if (!defined $byte) { die "not enough payload: need $cnt more in $_" }
-      $p_payload .= $byte;
+      $p_payload .= "$byte ";
     }
     print "  payload ==> $p_payload\n" if $DEBUG > 7;
     
@@ -123,7 +123,12 @@ while (<>) {
     print "--end packet--\n\n" if $DEBUG > 7;
     $last_length = $length;
 
-    print " $time $p_payload\n" if $DEBUG > 3;
+
+# FIXME - try to convert to .gp2 container format. But first see if packets look like something understandable...
+#    print "00/00/0006 $time$msec (0) A0 A2 ${p_payload}B0 B3\t# A0A2/B0B3 are fake.";
+    print "$time$msec ${p_payload}\t# ";
+    print " seq1=$p_seq1 seq2=$p_seq2 len=$p_length" if $DEBUG > 1;
+    print "\n";
 
   } else {
     die "unknown format for line: $_";
