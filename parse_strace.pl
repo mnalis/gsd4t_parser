@@ -19,12 +19,13 @@ my $last_hex = '';
 my $lasttime = undef;
 while (<>) {
     print "raw: $_" if $DEBUG > 8;
-    if (m{^(\d{2}:\d{2}:\d{2})(\.\d{3})\d* }) {
+    if (m{^(?:\d+\s+)?(\d{2}:\d{2}:\d{2})(\.\d{3})\d* }) {
         $lasttime = "$1$2";
         print "Timestamp is now = $lasttime\n" if $DEBUG > 6;
         next;
     }
     next if (m{^\)});				# ignore end of syscall lines
+    next if /^--$/;				# skip "grep -B1" artifacts 
     next if /^\s*$/;				# skip empty lines
     next if /^\s*#/;				# skip comment lines
     
