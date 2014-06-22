@@ -20,7 +20,7 @@ sub crc16($)
 
   $ctx->add($bin);
   my $ret = uc($ctx->hexdigest);
-  print "   calculating crc16_modbus($input) = 0x$ret\n" if $DEBUG > 7;
+  print "   calculating crc16_modbus($input) = 0x$ret\n" if $DEBUG > 8;
   return hex($ret);
 }
 
@@ -68,7 +68,7 @@ while (<>) {
     
 #### byte 3-4 (sequence2) ####
     my $p_seq2 = (shift @data) . (shift @data);	
-    # FIXME see what is it for? groupig of commands/session?
+    # FIXME see what is it for? grouping of commands/session?
     my $seq2 = hex($p_seq2);
     if (defined $last_seq2) {
         # FIXME: allow wraparound
@@ -108,7 +108,7 @@ while (<>) {
     if ($crc_payload != $crc_payload_verify) { die "CRC payload mismatch $crc_payload != $crc_payload_verify in $_" }
 
 #### end of packet ####
-    if (@data) { die "done processing packet, but there is still data remaining in it: @_" }
+    if (@data) { die "done processing packet, but there is still data @data remaining in $_" }
     print "--end packet--\n\n" if $DEBUG > 7;
 
     print " $time $p_payload\n" if $DEBUG > 3;
