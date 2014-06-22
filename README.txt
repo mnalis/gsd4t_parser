@@ -66,7 +66,7 @@ B0 B3 -- lead-out
 
 raw GSD4t strace has format (guessing):
 A0 A2 -- lead-in
-00 -- always zero? or 3rd (MSB) byte of sequence1?
+00 -- always zero? (NOT 3rd (MSB) byte of sequence1, it just wraps around)
 03 DE -- sequence1 (fast, ALMOST always incrementing, except on shortest null-commands (15 bytes altogether, and ending with FF FF B0 B3)
 00 9E -- sequence2 (slow, same for group of commands, and then increment by one)
 00 00 -- size. MSB first. size of full packet (A0A2...B0B3) less 15 bytes (for headers?)

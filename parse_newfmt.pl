@@ -13,7 +13,7 @@ my $DEBUG = 9;
 # 21/06/2014 00:02:23.287 (0)  A0 A2 00 03 E4 00 9F 00 14 04 5B 8E 02 03 01 43 03 71 00 00 00 00 00 00 00 00 00 00 00 00 00 F7 C9 B0 B3
 #
 # A0 A2 -- lead-in
-# 00    -- always zero? or 3rd (MSB) byte of sequence1?
+# 00    -- always zero?
 # 03E4  -- sequence1
 # 009F  -- sequence2
 # 0014  -- length of payload (length of full packet minus 0xf [full size of all headers]
