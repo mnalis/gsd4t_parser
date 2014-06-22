@@ -74,7 +74,13 @@ while (<>) {
     print "  header CRC16 = $crc_head (0x$p_crc_head)\n" if $DEBUG > 7;
 
 #### byte 9-xxx (actual payload) ####
-    my $p_payload = '';	# FIXME extract $length amount of bytes
+    my $p_payload = '';
+    my $cnt = $length;
+    while ($cnt--) {
+      my $byte = shift @data;
+      if (!defined $byte) { die "not enough payload: need $cnt more in $_" }
+      $p_payload .= $byte;
+    }
     print "  payload ==> $p_payload\n" if $DEBUG > 7;
     
 #### byte xxx+1 and xxx+1 (payload CRC16) ####
@@ -82,8 +88,8 @@ while (<>) {
     my $crc_payload = hex($p_crc_payload);
     print "  payload CRC16 = $crc_payload (0x$p_crc_payload)\n" if $DEBUG > 7;
 
-
-    # FIXME verify rest of the packet is empty    
+#### end of packet ####
+    if (@data) { die "done processing packet, but there is still data remaining in it: @_" }
 
     print " $time $p_payload\n" if $DEBUG > 3;
 
