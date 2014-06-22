@@ -71,8 +71,8 @@ A0 A2 -- lead-in
 00 9E -- sequence2 (slow, same for group of commands, and then increment by one)
 00 00 -- size. MSB first. size of full packet (A0A2...B0B3) less 15 bytes (for headers?)
 CE D2 -- CRC16 (modbus) [everything after A0A2 up to checksum] -- see http://www.lammertbies.nl/comm/info/crc-calculation.html
-         note this checksum does include payload - only sequnces and size!
-FF FF -- crc again? (for empty payload packet?)
+         note this checksum does not include payload - only sequnces and size!
+FF FF -- CRC16 again? (for empty payload packet?)
 B0 B3 -- lead-out
 
 or bigger packet:
@@ -81,9 +81,9 @@ A0 A2 -- lead-in
 03E4  -- sequence1
 009F  -- sequence2
 0014  -- size of payload - 0xf (15 dec)
-045B  -- crc16 (modbus) of headers (OK!)
+045B  -- CRC16 (modbus) of headers (OK!)
 8E 02 03 01 43 03 71 00 00 00 00 00 00 00 00 00 00 00 00 00 -- actual payload
-F7 C9 -- crc16 (modbus) of payload (OK!)
+F7 C9 -- CRC16 (modbus) of payload (OK!)
 B0 B3 -- lead-out
 
 
