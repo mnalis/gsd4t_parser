@@ -41,6 +41,8 @@ while (<>) {
     if ($checksum != $verify) { die "invalid checksum $checksum != $verify for $_" }
     
     print "  $time $MID $rest\n" if $DEBUG > 3;
+    
+    print "$time$msec ";
 
     given ($MID) {
       when ('FF') {
@@ -194,5 +196,4 @@ while (<>) {
   } else {
     die "unknown format for line: $_";
   }
-  #die;	# FIXME - test just first line
 }
