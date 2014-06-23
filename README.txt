@@ -19,6 +19,16 @@ or
 (2b) killall gpsd; /usr/sbin/gpsd -b -N SLCLog.bin & sleep 1; cgps
 
 
+if you suffer from gpsd(8) "device read of SLCLog.bin returned error or packet sniffer failed sync"
+bug (https://savannah.nongnu.org/bugs/index.php?36409), or bigger captures you'll instead have to feed 
+it via TCP instead:
+
+(1)  tcpserver localhost 50100 ./gp2_to_bin.pl data/2/SLCLog.gp2 &
+(2a) /usr/sbin/gpsd -b -N -D4 -n tcp://localhost:50100 >& SLCLog.gpsd.txt # ctrl-c when you think it is finished
+or
+(2b) killall gpsd; /usr/sbin/gpsd -b -N tcp://localhost:50100 & sleep 1; cgps
+
+
 Raw strace log, when formatted nicely with parse_strace.pl only on first
 look looks somewhat similar to SiRF binary format, but is quite different.
 

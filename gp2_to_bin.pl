@@ -6,6 +6,7 @@
 # Usage: ./gp2_to_bin.pl data/2/SLCLog.gp2 > slclog.bin
 #
 
+$|=1;
 
 while (<>) {
   next if /^\s*$/;				# skip empty lines
@@ -14,4 +15,5 @@ while (<>) {
   s/#.*$//;					# remove comments at the end of line
   s/\s+//g; 					# no whitespace allowd for pack
   print pack "H*", $_;
+#  sleep 1;		# comment out if not affected by gpsd(8) bug https://savannah.nongnu.org/bugs/index.php?36409
 }
