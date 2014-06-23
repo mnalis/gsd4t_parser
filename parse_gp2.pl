@@ -47,7 +47,7 @@ while (<>) {
     given ($MID) {
       when ('FF') {
         my $str = pack ('H*', $rest);
-        $str =~ s/6\n/%/g;
+        $str =~ s/\n/%/g;
         print "DEBUG TEXT(FF): $str\n";
       }
 
@@ -66,6 +66,13 @@ while (<>) {
           my $str = pack ('H*', $rest);
           $str =~ s/\n/%/g;
           print "DEBUG TEXT(44/FF):  $str\n";
+        } elsif ($SID eq 'E1') {
+          $rest = join '', @data;
+          my $str = pack ('H*', $rest);
+          $str =~ s/(.)/chr(ord($1)^0xff)/ge;	# XOR 0xFF
+          $str =~ s/^\xFF//;			# remove leading 0xFF if exists
+          $str =~ s/\n/%/g;
+          print "DEV TEXT(44/E1): $str\n";
         } else {
           print "MID 0x$MID -skip unknown SID 0x$SID - $rest\n" if $DEBUG > 0;
         }
