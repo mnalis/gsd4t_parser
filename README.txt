@@ -188,3 +188,5 @@ A0A2 00  03F4 00A3 0014 CB5A 8E 02 03 01 43 03 71 00 00 00 00 00 00 00 00 00 00 
 - parse_newfmt.pl - checks new binary protocol (in .gp2 container format) for validity and outputs debug
 
   run as ./parse_strace.pl  | ./parse_newfmt.pl
+
+- gpsd_messages_count.sh - shows SiRF binary messages that gpsd(8) parsed (or didn't)
