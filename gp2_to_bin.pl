@@ -8,7 +8,10 @@
 
 
 while (<>) {
-  s/^.*\(0\) //; 	# remote timestamps etc
-  s/\s+//g; 		# no whitespace allowd for pack
+  next if /^\s*$/;				# skip empty lines
+  next if /^\s*#/;				# skip comment lines
+  s/^.*\(0\) //; 				# remove timestamps etc
+  s/#.*$//;					# remove comments at the end of line
+  s/\s+//g; 					# no whitespace allowd for pack
   print pack "H*", $_;
 }
