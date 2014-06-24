@@ -70,7 +70,8 @@ and SLCLog.gp2 maching entry is possibly:
 Also, while SiRF binary SLCLog.gp2 has format:
 A0 A2 -- lead-in
 XX XX -- length
-XX XX XX ... -- payload
+XX    -- MID (command)
+XX XX XX ... -- rest of the payload
 XX XX -- checksum
 B0 B3 -- lead-out
 
