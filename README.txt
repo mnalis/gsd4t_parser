@@ -154,7 +154,7 @@ A0A2 00  03F4 00A3 0014 CB5A 8E 02 03 01 43 03 71 00 00 00 00 00 00 00 00 00 00 
 
 
 ---- UTILS AVAILABLE ----
-- parse_gp2.pl -- parses SLCLog.gp2 to verify basic checksums and conformance. 
+- gp2_to_human.pl -- parses SLCLog.gp2 to verify basic checksums and conformance. 
   for more parsing, use gp2_to_bin.pl, gpsd(8) and cgps(1) instead.
 
   to get SLCLog.gp2 and other debug files, do:
