@@ -22,11 +22,27 @@ $| = 1;
 
 my @data=();
 
-# returns 8-bit value
-sub get_var8() {
-    return shift @data;
+# returns n-byte value
+sub get_byte($) {
+    my ($count) = @_;
+    my $ret = '';
+    print "   reading $count byte-value: 0x" if $DEBUG > 6;
+    while ($count--) { $ret .= shift @data }
+    print "$ret\n" if $DEBUG > 6;
+    return $ret;
 }
 
+# returns variable-length variable
+sub get_varvar() {
+    my $size = get_byte(1);
+    print "   variable-length variable follows: 0x$size" if $DEBUG > 7;
+    return get_byte(1) if ($size eq '20');
+    return get_byte(2) if ($size eq '40');
+    return get_byte(3) if ($size eq '60');
+    die "unknown length variable of 0x$size";
+}
+
+######### MAIN ##########
 while (<>) {
   next if /^\s*$/;	# skip empty lines
   next if /^\s*#/;	# skip comment lines
@@ -36,16 +52,35 @@ while (<>) {
     @data = split ' ', $4;
     my $CMD = shift @data;
     my $SUB = shift @data;
-    my $length = hex(shift @data);
+    my $expected_len = hex(shift @data);
     my $rest = join '', @data;
     
-    print "  $time $CMD $SUB ($length) $rest\n" if $DEBUG > 3;
+    my $real_len = 3+ scalar @data;		# "expected_len" includes CMD, SUB and expected_len
+    if ($real_len != $expected_len) {
+        warn "WARNING: skipping due to invalid length - found $real_len, expected $expected_len: $_";	
+        # FIXME - sometimes length is not what it seems?
+        next;
+    }
+    
+    
+    
+    print "  $time $CMD $SUB ($expected_len) $rest\n" if $DEBUG > 3;
     
     print "$time$msec ";
 
     given ("$CMD$SUB") {
       when ('2D03') {
           print "FIXME - parse 2D03\n";
+      }
+      when ('2D0B') {
+          print "FIXME - parse 2D0B\n";
+      }
+      when ('3D04') {
+          my $noise = hex get_varvar();
+          my $n2 = hex get_varvar();
+          my $freq = hex get_varvar();
+          my $gain = hex get_byte(1);
+          print "parsed 0x$CMD$SUB: AGC: noise $noise $n2 freq $freq gain $gain\n";
       }
 
       
