@@ -100,7 +100,7 @@ while (<>) {
       }
 
       when ('08') {
-          print "GPSD knows MID 0x$MID --  subframe data MID 8 (extract leap-second from this)";
+          print "GPSD knows MID 0x$MID --  subframe data MID 8 (extract leap-second from this)\n";
       }
 
       when ('09') {
