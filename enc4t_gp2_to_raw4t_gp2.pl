@@ -2,7 +2,7 @@
 # by Matija Nalis <mnalis-android@voyager.hr> GPLv3+, started 2014-06-22
 # parse .gp2 container having new GSD4t binary data (double-CRC one) and run checks on it
 #
-# Usage: ./strace_to_gp2.pl | ./parse_newfmt.pl
+# Usage: ./strace_to_gp2.pl | ./enc4t_gp2_to_raw4t_gp2.pl
 #
 use strict;
 use autodie;
