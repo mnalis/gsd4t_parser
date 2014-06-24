@@ -53,7 +53,7 @@ while (<>) {
 
 #### byte 0 (always 00) ####
     my $p_lead_zero = shift @data; 
-    if ($p_lead_zero ne '00') { warn "leading zero not 00 but $p_lead_zero in $_" }
+    if ($p_lead_zero ne '00') { warn "# WARNING: leading zero not 00 but $p_lead_zero in $_" }
     print "  leading 00 -- OK\n" if $DEBUG > 7;
 
 #### byte 1-2 (sequence1) ####
@@ -69,7 +69,7 @@ while (<>) {
               ($seq2 == $last_seq2) or				# ... new=last
               ( ($seq2 == 0) and ($last_seq2 == 65535) )	# allow wraparound at 0xffff to 0x0000
         ) {} else {
-            warn "last seq2 was $last_seq2, didn't expect $seq2 in $_";
+            warn "# WARNING: last seq2 was $last_seq2, didn't expect $seq2 in $_";
         }
     }
     $last_seq2 ||= 'undef'; print "  seq2 $last_seq2 + 0/1 = $seq2 (0x$p_seq2) -- OK\n" if $DEBUG > 7;
@@ -89,7 +89,7 @@ while (<>) {
               ( ($seq1 == 0) and ($last_seq1 == 65535) ) or	# allow wraparound at 0xffff to 0x0000
               ( ($last_length == 0) and ($seq1 == $last_seq1) )	# may be new=last if zero-lenght packet
         ) {} else {
-            warn "last seq1 was $last_seq1, didn't expect $seq1 in ($last_length) $_";
+            warn "# WARNING: last seq1 was $last_seq1, didn't expect $seq1 in ($last_length) $_";
         }
     }
     $last_seq1 ||= 'undef'; print "  seq1 $last_seq1 + 1 = $seq1 (0x$p_seq1) -- OK\n" if $DEBUG > 7;
@@ -100,7 +100,7 @@ while (<>) {
     my $crc_head = hex($p_crc_head);
     print "  header CRC16 = $crc_head (0x$p_crc_head)\n" if $DEBUG > 7;
     my $crc_head_verify = crc16("$p_lead_zero $p_seq1 $p_seq2 $p_length");
-    if ($crc_head != $crc_head_verify) { warn "CRC header mismatch $crc_head != $crc_head_verify in $_"; next }
+    if ($crc_head != $crc_head_verify) { warn "# WARNING: CRC header mismatch $crc_head != $crc_head_verify in $_"; next }
 
 #### byte 9-xxx (actual payload) ####
     my $p_payload = '';
