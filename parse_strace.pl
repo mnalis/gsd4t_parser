@@ -32,7 +32,7 @@ while (<>) {
     if (m{^\s+\|\s+[a-f0-9]+\s+(([a-f0-9]{2} ){1,8}( ([a-f0-9]{2} ){1,8}\s)?)}) {
       print "Start of hex $1\n" if $DEBUG > 5;
       $last_hex .= $1;
-      if ($last_hex =~ /^(.*\s+b0\s+b3)(.*)$/i) {
+      if ($last_hex =~ /^(.*?\s+b0\s+b3)(.*)$/i) {
           $last_hex = $2;
           my $packet = uc($1);
           print "Found whole packet: $packet\n" if $DEBUG > 2;
