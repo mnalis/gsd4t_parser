@@ -39,7 +39,7 @@ sub get_varvar() {
     return get_byte(1) if ($size eq '20');
     return get_byte(2) if ($size eq '40');
     return get_byte(3) if ($size eq '60');
-    die "unknown length variable of 0x$size";
+    warn "unknown length variable of 0x$size -- $_";
 }
 
 ######### MAIN ##########
@@ -70,7 +70,17 @@ while (<>) {
 
     given ("$CMD$SUB") {
       when ('2D03') {
-          print "FIXME - parse 2D03\n";
+          my $label = hex get_varvar();
+          my $new = hex get_byte(1);
+          my $type = hex get_byte(1);
+          my $sv = hex get_byte(1);
+          my $ch = hex get_byte(1);
+          my $D = hex get_varvar();
+          my $C = hex get_byte(1);
+          my $c2 = hex get_byte(1);
+          my $c3 = hex get_varvar();
+          print "parsed 0x$CMD$SUB: $label ACQ: New$new type$type sv$sv ch$ch D:$D C:$C $c2 $c3\n";
+          # FIXME -- maybe we always need to be get_varvar() ? and then if value is literal "40" for example, we would get "20 40" instead (20=1byte, 40=value);
       }
       when ('2D0B') {
           print "FIXME - parse 2D0B\n";
@@ -86,7 +96,13 @@ while (<>) {
       
       default {
         print "skip unknown CMD 0x$CMD SUB 0x$SUB $rest\n" if $DEBUG > 0;
+        next;
       }
+    }
+    
+    # if we parsed packet, there should be NO data remaining...
+    if (@data) {
+      die "finished decoding packet, but data still remains: @data";
     }    
   } else {
     warn "# WARNING: unknown format for line (maybe not E1 0A - FIXME): $_";
