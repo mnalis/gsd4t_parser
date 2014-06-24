@@ -2,7 +2,7 @@
 # by Matija Nalis <mnalis-android@voyager.hr> GPLv3+, started 2014-06-21
 # parse SLCLog.gp2 created by GSD4t on Samsung Galaxy S2 running CyanogenMod9
 #
-# Usage: ./gp2_to_human.pl data/2/SLCLog.gp2
+# Usage: ./sirfbin_gp2_to_human.pl data/2/SLCLog.gp2
 #
 use strict;
 use autodie;
