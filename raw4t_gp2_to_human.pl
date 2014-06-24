@@ -7,6 +7,7 @@
 use strict;
 use autodie;
 use feature "switch";
+use feature "say";
 
 my $DEBUG = 2;
 $| = 1;
@@ -28,7 +29,7 @@ sub get_byte($) {
     my $ret = '';
     print "   reading $count byte-value: 0x" if $DEBUG > 6;
     while ($count--) { $ret .= shift @data }
-    print "$ret\n" if $DEBUG > 6;
+    say "$ret" if $DEBUG > 6;
     return $ret;
 }
 
@@ -39,7 +40,7 @@ sub get_varvar() {
     return get_byte(1) if ($size eq '20');
     return get_byte(2) if ($size eq '40');
     return get_byte(3) if ($size eq '60');
-    warn "unknown length variable of 0x$size -- $_";
+    die "unknown length variable of 0x$size -- $_";
 }
 
 ######### MAIN ##########
@@ -64,12 +65,15 @@ while (<>) {
     
     
     
-    print "  $time $CMD $SUB ($expected_len) $rest\n" if $DEBUG > 3;
+    say "  $time $CMD $SUB ($expected_len) $rest" if $DEBUG > 3;
     
     print "$time$msec ";
 
     given ("$CMD$SUB") {
       when ('2D03') {
+#      E1 0A 
+#      2D 03 
+#      13 40 02 58 05 00 19 20 29 60 01 7A C9 1E 00 20 F8   
           my $label = hex get_varvar();
           my $new = hex get_byte(1);
           my $type = hex get_byte(1);
@@ -79,23 +83,34 @@ while (<>) {
           my $C = hex get_byte(1);
           my $c2 = hex get_byte(1);
           my $c3 = hex get_varvar();
-          print "parsed 0x$CMD$SUB: $label ACQ: New$new type$type sv$sv ch$ch D:$D C:$C $c2 $c3\n";
+          say "parsed 0x$CMD$SUB: $label ACQ: New$new type$type sv$sv ch$ch D:$D C:$C $c2 $c3";
           # FIXME -- maybe we always need to be get_varvar() ? and then if value is literal "40" for example, we would get "20 40" instead (20=1byte, 40=value);
       }
       when ('2D0B') {
-          print "FIXME - parse 2D0B\n";
+          say "FIXME - parse 2D0B";
       }
       when ('3D04') {
           my $noise = hex get_varvar();
           my $n2 = hex get_varvar();
           my $freq = hex get_varvar();
           my $gain = hex get_byte(1);
-          print "parsed 0x$CMD$SUB: AGC: noise $noise $n2 freq $freq gain $gain\n";
+          say "parsed 0x$CMD$SUB: AGC: noise $noise $n2 freq $freq gain $gain";
       }
 
-      
+      when ('4E0B') {
+          my $label = hex get_varvar();
+          my $sv = hex get_byte(1);
+          my $ch = hex get_byte(1);
+          my $cno= hex get_varvar();
+          my $sync = hex get_byte(1);
+          my $val = hex get_byte(1);
+          my $frq = hex get_varvar();
+          my $rest = get_byte(6);
+          say "parsed 0x$CMD$SUB: $label TRACK: StartTrack sv$sv ch $ch cno$cno sync$sync val$val frq$frq -- FIXME rest: $rest";
+      }
+
       default {
-        print "skip unknown CMD 0x$CMD SUB 0x$SUB $rest\n" if $DEBUG > 0;
+        say "skip unknown CMD 0x$CMD SUB 0x$SUB $rest" if $DEBUG > 0;
         next;
       }
     }
