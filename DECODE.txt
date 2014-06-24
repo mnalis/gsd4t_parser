@@ -49,39 +49,41 @@
 -------------------------------------------
 
 
---- len=14 ACQ New variant ---
+--- len=14 "ACQ New" variant ---
 16:21:36.400 E1 0A 2D 03 12 40 08 34 05 00 0E 1E 60 01 81 C7 00 00 20 F8 	#  seq1=0070 seq2=0007 len=0014
 16:21:36.401 DEV TEXT(44/E1):  2100 ACQ: New5 type0 sv14 ch30 D:98759 C:0 0 248
 
-16:21:36.400 E1 0A 2D 03 12 40 -- opcode for "ACQ New short"?
+16:21:36.400 E1 0A 2D 03 12  -- opcode for "ACQ New short"?
+40 -- next value 2bytes
 08 34 -- 2100
 05 -- New5
 00 -- type0
 0E -- sv14
 1E -- ch30
-60 -- ?
+60 -- next value 3bytes
 01 81 C7 -- D:98759
 00 -- C:0
 00 -- 0
-20 -- ?
+20 -- next value 1byte
 F8 -- 248
 
---- len=15 ACQ New variant ---
+--- len=15 "ACQ New" variant ---
 16:21:36.509 E1 0A 2D 03 13 40 08 98 07 03 02 20 26 60 01 80 81 00 13 20 F7 	#  seq1=0073 seq2=0007 len=0015
 16:21:36.511 DEV TEXT(44/E1):  2200 ACQ: New7 type3 sv 2 ch38 D:98433 C:0 19 247
 
-16:21:36.509 E1 0A 2D 03 13 40  -- opcode for "ACQ New long"? (notice 12 vs. 13 -- lenght of packet?)
+16:21:36.509 E1 0A 2D 03 13  -- opcode for "ACQ New long"? (notice 12 vs. 13 -- lenght of packet?)
+40 -- next value 2bytes
 08 98 -- 2200
 07 -- New7
 03 -- type3
 02 -- sv 2
-20 -- ?
+20 -- next value 1byte
 26 -- ch38
-60 -- ?
+60 -- next value 3bytes
 01 80 81 --  D:98433
 00 -- C:0
 13 -- 19
-20 -- ?
+20 -- next value 1byte
 F7 -- 247
 
 
@@ -90,11 +92,12 @@ F7 -- 247
 16:21:37.092 E1 0A 3D 04 0F 60 16 71 43 40 46 00 60 01 50 ED 1B 	#  seq1=0080 seq2=0007 len=0011
 16:21:37.095 DEV TEXT(44/E1): AGC: noise 1470787 17920 freq 86253 gain 27
 
-16:21:37.092 E1 0A 3D 04 0F 60 -- opcode for "AGC: noise/freq/gain" ?
+16:21:37.092 E1 0A 3D 04 0F -- opcode for "AGC: noise/freq/gain" ?
+60 -- next value 3bytes
 16 71 43  -- noise 1470787
-40 -- ?
+40 -- next value 2bytes
 46 00 -- 17920
-60 -- ?
+60 -- next value 3bytes
 01 50 ED -- freq 86253
 1B -- gain 27
 
@@ -105,22 +108,22 @@ F7 -- 247
 
 16:21:36.498 E1 0A 2D 0B 2E 40 -- opcode for "ACQ: Sx"
 08 98 -- 2200
-20 -- ?
-53 -- ?
-05 -- S5
+20 -- next value 1byte
+53 -- "S"
+05 -- 5
 02 -- sv 2
-20 -- ?
+20 -- next value 1byte
 26 -- ch38
 13 -- CN0:19
-60 -- ?
+60 -- next value 3bytes
 01 80 81 -- D:98433
 00 -- 0
 42 FF CE AB     -- FIXME C:127.90 (see floating point 4-byte formulas?)
 00 00 00 00 -- 0.00 ?
-20 -- ?
+20 -- next value 1byte
 82 -- Th:130
 00 -- 0
-20 -- ?
+20 -- next value 1byte
 F0 -- Pk:240 
 04 -- 4
 03 -- 3
@@ -128,32 +131,32 @@ F0 -- Pk:240
 00 -- ms:0
 00 -- vo:0
 00 -- bs:0
-40 -- ?
+40 -- next value 2bytes
 06 1F -- 156760 
 2F F3 26 - 3142438 
-20 -- ?
+20 -- next value 1byte
 39 --  57
 
 16:21:37.099 E1 0A 2D 0B 2F 40 0A F0 20 53 05 19 20 29 11 60 01 7A C8 00 42 FF A5 BA 00 00 00 00 20 B1 00 40 01 05 04 03 00 00 00 00 40 09 93 60 4A 47 E3 20 58 	#  seq1=0081 seq2=0007 len=0031
 16:21:37.102 DEV TEXT(44/E1):  2800 ACQ: S5 sv25 ch41 CN0:17 D:96968  0 C:127.82 0.00 Th:177 0 Pk:261 4 3 0000 ms:0 vo:0 bs:0 2451 4868067 88
 16:21:37.099 E1 0A 2D 0B 2F 40
  0A F0 -- 2800
- 20
- 53
- 05 - S5
+ 20 -- next value 1byte
+ 53 -- "S"
+ 05 -- 5
  19 -- sv25
- 20
+ 20 -- next value 1byte
  29 -- ch41
  11 -- CN0:17
- 60 
+ 60 -- next value 3bytes
  01 7A C8 -- D:96968
  00 -- 0
  42 FF A5 BA -- C:127.82
  00 00 00 00 -- 0.00
- 20
+ 20 -- next value 1byte
  B1 -- Th:177
  00 -- 0
- 40
+ 40 -- next value 2bytes
  01 05 -- Pk:261 (notice -- two bytes! and 40 byte before as opposed to 20 in 1-byte packet before) 
  04 -- 4
  03 -- 3
@@ -161,9 +164,12 @@ F0 -- Pk:240
  00 -- ms:0
  00 -- vo:0
  00 -- bs:0
- 40
+ 40 -- next value 2bytes
  09 93 -- 2451
- 60
+ 60 -- next value 3bytes
  4A 47 E3 -- 4868067
- 20
+ 20 -- next value 1byte
  58 -- 88
+
+
+it seems to 0x20/40/60 before same value indicate length (1/2/3 bytes)
