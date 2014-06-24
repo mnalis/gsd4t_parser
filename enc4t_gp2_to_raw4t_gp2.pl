@@ -125,10 +125,8 @@ while (<>) {
     $last_length = $length;
 
 
-# FIXME - try to convert to .gp2 container format. But first see if packets look like something understandable...
-#    print "00/00/0006 $time$msec (0) A0 A2 ${p_payload}B0 B3\t# A0A2/B0B3 are fake.";
-    print "$time$msec ${p_payload}\t# ";
-    print " seq1=$p_seq1 seq2=$p_seq2 len=$p_length" if $DEBUG > 1;
+    print "00/00/0006 $time$msec (0) ${p_payload}";
+    print "\t# seq1=$p_seq1 seq2=$p_seq2 len=$p_length" if $DEBUG > 1;
     print "\n";
 
   } else {
