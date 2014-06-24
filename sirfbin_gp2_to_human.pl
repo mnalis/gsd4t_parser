@@ -9,6 +9,7 @@ use autodie;
 use feature "switch";
 
 my $DEBUG = 2;
+$| = 1;
 
 # format is like:
 # 21/06/2014 00:02:23.287 (0) A0 A2 00 0C FF 41 53 49 43 3A 20 47 53 44 34 54 03 DF B0 B3 
