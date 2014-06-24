@@ -29,7 +29,7 @@ or
 (2b) killall gpsd; /usr/sbin/gpsd -b -N tcp://localhost:50100 & sleep 1; cgps
 
 
-Raw strace log, when formatted nicely with parse_strace.pl only on first
+Raw strace log, when formatted nicely with strace_to_gp2.pl only on first
 look looks somewhat similar to SiRF binary format, but is quite different.
 
 for example, strace is:
@@ -171,7 +171,7 @@ A0A2 00  03F4 00A3 0014 CB5A 8E 02 03 01 43 03 71 00 00 00 00 00 00 00 00 00 00 
 - gp2_to_bin.pl - parses SLCLog.gp2 and creates raw binary commands (like SLCLog.bin)
   useful for creating binary files to give to gpsd(8) and cgps(1) to replay session
 
-- parse_strace.pl - converts strace logs to human readable format
+- strace_to_gp2.pl - converts strace logs to human readable format
   parses raw binary communication in strace.log.* files (from /dev/ttySAC1 GPS GSD4t chipset) 
   and creates human readable log suitible for comparing with SLCLog.gp2 and guessing translations.
 
@@ -188,6 +188,6 @@ A0A2 00  03F4 00A3 0014 CB5A 8E 02 03 01 43 03 71 00 00 00 00 00 00 00 00 00 00 
 
 - parse_newfmt.pl - checks new binary protocol (in .gp2 container format) for validity and outputs debug
 
-  run as ./parse_strace.pl  | ./parse_newfmt.pl
+  run as ./strace_to_gp2.pl  | ./parse_newfmt.pl
 
 - gpsd_messages_count.sh - shows SiRF binary messages that gpsd(8) parsed (or didn't)

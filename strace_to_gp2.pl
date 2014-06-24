@@ -3,7 +3,7 @@
 # parse strace.log created by "strace -e trace=open,read,write -e write=275 -e read=275 -tt -v -ff -o strace.log  -p 2029"
 # and output it in SLCLog.gp2 alike format
 #
-# Usage: ./parse_strace.pl data/strace4/strace.log.3491
+# Usage: ./strace_to_gp2.pl data/strace4/strace.log.3491
 use strict;
 use autodie;
 
