@@ -46,6 +46,14 @@ sub get_var() {
     return $size;	# if no special prefix for size, then it is our one-byte value!
 }
 
+# like hex(), but autodetect signed values
+sub signhex($) {
+    my ($h) = @_;
+    my $ret = hex($h);
+    $ret = unpack('l', pack('L', $ret)) if $h =~ /^FFFF....$/;	# FIXME: support any 32-bit? other sizes too?
+    return $ret;
+}
+
 ######### MAIN ##########
 while (<>) {
   next if /^\s*$/;	# skip empty lines
@@ -74,25 +82,13 @@ while (<>) {
 
     given ("$CMD$SUB") {
       when ('2D03') {
-#16:21:34.905 unknown length variable of 0x80 -- 00/00/0006 16:21:34.905 (0) E1 0A 2D 03 17
-# 40 02 58 - 600
-# 05 - new5
-# 00 - type0
-# 19 - sv25
-# 20 28 - ch40
-# 60 01 7A C9 -D:96969
-# 80 FF FF FF E2 - C:-30
-# 00 - 0
-# 20 F8 - 248
-# 600 ACQ: New5 type0 sv25 ch40 D:96969 C:-30 0 248
-    
           my $label = hex get_var();
           my $new = hex get_var();
           my $type = hex get_var();
           my $sv = hex get_var();
           my $ch = hex get_var();
           my $D = hex get_var();
-          my $C = hex get_var();
+          my $C = signhex get_var();
           my $c2 = hex get_var();
           my $c3 = hex get_var();
           say "parsed 0x$CMD$SUB: $label ACQ: New$new type$type sv$sv ch$ch D:$D C:$C $c2 $c3";
