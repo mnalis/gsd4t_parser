@@ -25,6 +25,7 @@ my $packet;	# whole packet
 my @data=();	# split packet
 my $CMD;	# command/MID equivalent
 my $SUB;	# subcommand/SID equivalent
+my $expected_len;	# expected total length of packet
 
 # returns n-byte value
 sub get_byte($) {
@@ -120,6 +121,29 @@ sub parsed($) {
     return "parsed 0x$CMD$SUB: $str";
 }
 
+# parse unknown number of subpackets
+sub parse_subpackets ($$) {
+  my ($cmd_sub, $len_sub) = @_;
+        
+  my $str = '';
+  while (@data) {
+      my $sCMD = get_byte(1);
+      my $sSUB = get_byte(1);
+      my $sLEN = get_byte(1);
+      if ("$sCMD$sSUB" ne '1422' or $sLEN != 5) { die "don't understand 0x1420 subpacket 0x$sCMD$sSUB($sLEN)" }
+      my $sDATA = get_byte ($sLEN-3);	# sCMD+sSUB+sLEN have already been read
+      
+      foreach my $d (map "$_", $sDATA =~ /(..)/g) {
+          $str .= hex($d) . "-";
+      }
+      chop $str; $str .= ' ';
+      
+      $expected_len += $sLEN;
+  }
+  chop $str;
+  return $str;
+}
+
 ######### MAIN ##########
 while (<>) {
   next if /^\s*$/;	# skip empty lines
@@ -135,29 +159,30 @@ while (<>) {
         say "$time$msec skipping empty packet -- $comments" if $DEBUG > 2;
         next;
     }
-    my $LEAD_IN = (shift @data) . (shift @data);
+    my $LEAD_IN = get_byte(2);
     if ($LEAD_IN ne 'E10A') {
         print "$time$msec skipping currently unusupported LEAD-IN $LEAD_IN: $_";
         next;
     }
     
-    $CMD = shift @data;
-    $SUB = shift @data;
-    my $expected_len = hex(shift @data);
+    $CMD = get_byte(1);
+    $SUB = get_byte(1);
+    $expected_len = hex get_byte(1);
     my $rest = join '', @data;
     
     my $real_len = 3+ scalar @data;		# "expected_len" includes CMD, SUB and expected_len
-    if ($real_len != $expected_len) {
-        warn "WARNING: skipping due to invalid length - found $real_len, expected $expected_len: $_";	
-        # FIXME - sometimes length is not what it seems?
-        next;
-    }
     
     say "  $time $LEAD_IN $CMD $SUB ($expected_len) $rest" if $DEBUG > 3;
     
     print "$time$msec ";
 
     given ("$CMD$SUB") {
+      when ('1420') {
+          print parsed "%u ChdevsA: ";
+          say parse_subpackets('1422', 5);
+      }
+          
+      
       when ('1F01') {
           say parsed "%u ATX PP: Seq:%u Mode:%u Ev:0x%x A:%u SVList:0x%x 0x%x SVs:%u %u %u %u %u %u %u %u %u %u %u %u %u %u %u";
       }
@@ -225,6 +250,11 @@ while (<>) {
     if (@data) {
       die "finished decoding packet, but data still remains: @data";
     }    
+
+    if ($real_len != $expected_len) {
+        die "FATAL: invalid length - found $real_len, expected $expected_len: $_";	
+    }
+
   } else {
     die "FATAL: unknown format for line: $_";
   }
