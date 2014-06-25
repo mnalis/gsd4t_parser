@@ -236,4 +236,18 @@ E1 0A -- lead-in (although there seems to be others, like 84, 8E etc... find the
 20 54 -  uN:84 
 40 05 DC -  uF:1500  	# seq1=000B seq2=0002 len=0026
 
-
+--- CM:RtcEdgeAlign ---
+00/00/0006 16:21:34.323 (0) E1 0A 54 26 2E 00 20 8E 02 40 17 FD 40 33 A6 40 D7 49 40 17 76 3F 62 40 00 00 00 00 00 40 47 DD 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 	# seq1=0011 seq2=0002 len=0030
+16:21:34.407 DEV TEXT(44/E1):     0 CM:RtcEdgeAlign T:142 dRate:2 count:6141 13222 Acq:55113 Wclk:6006 dRtc:0.002227783 prevAcq:18397 bepDrift:0.000000000 rtcDrift:0.000000000
+00/00/0006 16:21:34.323 (0) E1 0A 54 26 2E 
+ 00 - 0
+ 20 8E - T:142
+ 02 - dRate:2
+ 40 17 FD - count:6141
+ 40 33 A6 - 13222
+ 40 D7 49 - Acq:55113
+ 40 17 76 - Wclk:6006
+ 3F 62 40 00 00 00 00 00 - dRtc:0.002227783
+ 40 47 DD - prevAcq:18397
+ 00 00 00 00 00 00 00 00 - bepDrift:0.000000000 
+ 00 00 00 00 00 00 00 00 - rtcDrift:0.000000000 	# seq1=0011 seq2=0002 len=0030

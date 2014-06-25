@@ -77,7 +77,7 @@ sub get_double() {
     sub double($) {	# returns double precision floating point representation
         my ($h) = @_;
         my @h2 = reverse map "$_", $h =~ /(..)/g;
-        return sprintf("%.6f", unpack "d*", pack "H*", join('',@h2));	# convert (assumed) 8 hex bytes in IEEE-754 double precision floating point. beware of the endian issues!
+        return sprintf("%.9f", unpack "d*", pack "H*", join('',@h2));	# convert (assumed) 8 hex bytes in IEEE-754 double precision floating point. beware of the endian issues!
     }
     return double get_byte(8);
 }
@@ -90,6 +90,7 @@ sub get_double() {
 #   %g is 8-byte double
 #   %c is 1-byte char
 #   %x is 1-byte hex value
+#   %0 (special) - read 1-byte value and discard it, not printing anything
 sub parsed($) {
     # FIXME - maybe we should just use sprintf() instead trying to reinvent it badly?
     sub parse_one($) {		# fetches from packet and parses one format variable
@@ -102,6 +103,7 @@ sub parsed($) {
             when ('g') { return get_double() }
             when ('c') { return chr hex get_var() }
             when ('x') { return get_var() }
+            when ('0') { get_byte(1); return '' }
             default { die "parse_one: unknown format char %$format" }
         }
     }
@@ -150,7 +152,11 @@ while (<>) {
       }
 
       when ('4E0B') {
-          say parsed "%u TRACK: StartTrack sv%u ch %u cno%u sync%u val%u frq%u -- FIXME rest: %x%x%x%x%x%x";
+          say parsed "%u TRACK: StartTrack sv%u ch%u cno%u sync%u val%u frq%u -- FIXME rest: %x %x %x %x %x %x";
+      }
+      
+      when ('5426') {
+          say parsed "%u CM:RtcEdgeAlign T:%u dRate:%u count:%u %u Acq:%u Wclk:%u dRtc:%g prevAcq:%u bepDrift:%g rtcDrift:%g";
       }
       
       when ('5493') {
@@ -163,14 +169,20 @@ while (<>) {
 
       default {
         say "skip unknown CMD 0x$CMD SUB 0x$SUB $rest" if $DEBUG > 0;
-        next; # FIXME DELME
+        #next; # FIXME DELME
         my $count=0;
         while (@data) {
-            my $unknown = get_var();
-            my $unk_dec = hex($unknown);
-            say "    unknown var$count = 0x$unknown ($unk_dec)"; 
+            if ($data[0] =~ /^[ACE]0/) {	# this would die on get_var(). so  assume float (athough it might be double, too)
+              my $unk_float = get_float();
+              say "    unknown var$count (guess float?) = $unk_float";
+            } else {		# guess normal byte
+              my $unknown = get_var();
+              my $unk_dec = hex($unknown);
+              say "    unknown var$count = 0x$unknown ($unk_dec)"; 
+            }
             $count++;
         }
+        die "FIXME this cmdcode" if "$CMD$SUB" eq '5426';
         # die "FIXME please parse and add this command code $CMD $SUB";
         next;
       }
