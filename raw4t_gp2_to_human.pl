@@ -167,6 +167,10 @@ while (<>) {
           say parsed "%u CM:XO:LastCal:%u freq:%u freqUnc:%u rD:%g rT:%g tr:%u uG:%u fHC:%u mD:%u";
       }
 
+      when ('69AB') {
+          say parsed "%u ATX: Meas Send:%u %u %u %u %u %u %u %u";
+      }
+
       default {
         say "skip unknown CMD 0x$CMD SUB 0x$SUB $rest" if $DEBUG > 0;
         #next; # FIXME DELME
@@ -182,7 +186,7 @@ while (<>) {
             }
             $count++;
         }
-        die "FIXME this cmdcode" if "$CMD$SUB" eq '5426';
+        die "FIXME this cmdcode" if "$CMD$SUB" eq '69AB';
         # die "FIXME please parse and add this command code $CMD $SUB";
         next;
       }
