@@ -9,7 +9,7 @@ use autodie;
 use feature "switch";
 use feature "say";
 
-my $DEBUG = 2;
+my $DEBUG = 3;
 $| = 1;
 
 # format is like:
@@ -33,14 +33,17 @@ sub get_byte($) {
     return $ret;
 }
 
+
 # returns variable-length variable
-sub get_varvar() {
+sub get_var() {
     my $size = get_byte(1);
-    print "   variable-length variable follows: 0x$size" if $DEBUG > 7;
+    print "   possible variable-length variable follows: 0x$size" if $DEBUG > 7;
     return get_byte(1) if ($size eq '20');
     return get_byte(2) if ($size eq '40');
     return get_byte(3) if ($size eq '60');
-    die "unknown length variable of 0x$size -- $_";
+    return get_byte(4) if ($size eq '80');
+    die "unknown length variable of 0x$size -- $_" if ($size eq 'A0') or ($size eq 'C0') or ($size eq 'E0') ;	# FIXME - maybe those are special too, maybe not. die for now so we can check...
+    return $size;	# if no special prefix for size, then it is our one-byte value!
 }
 
 ######### MAIN ##########
@@ -71,40 +74,48 @@ while (<>) {
 
     given ("$CMD$SUB") {
       when ('2D03') {
-#      E1 0A 
-#      2D 03 
-#      13 40 02 58 05 00 19 20 29 60 01 7A C9 1E 00 20 F8   
-          my $label = hex get_varvar();
-          my $new = hex get_byte(1);
-          my $type = hex get_byte(1);
-          my $sv = hex get_byte(1);
-          my $ch = hex get_byte(1);
-          my $D = hex get_varvar();
-          my $C = hex get_byte(1);
-          my $c2 = hex get_byte(1);
-          my $c3 = hex get_varvar();
+#16:21:34.905 unknown length variable of 0x80 -- 00/00/0006 16:21:34.905 (0) E1 0A 2D 03 17
+# 40 02 58 - 600
+# 05 - new5
+# 00 - type0
+# 19 - sv25
+# 20 28 - ch40
+# 60 01 7A C9 -D:96969
+# 80 FF FF FF E2 - C:-30
+# 00 - 0
+# 20 F8 - 248
+# 600 ACQ: New5 type0 sv25 ch40 D:96969 C:-30 0 248
+    
+          my $label = hex get_var();
+          my $new = hex get_var();
+          my $type = hex get_var();
+          my $sv = hex get_var();
+          my $ch = hex get_var();
+          my $D = hex get_var();
+          my $C = hex get_var();
+          my $c2 = hex get_var();
+          my $c3 = hex get_var();
           say "parsed 0x$CMD$SUB: $label ACQ: New$new type$type sv$sv ch$ch D:$D C:$C $c2 $c3";
-          # FIXME -- maybe we always need to be get_varvar() ? and then if value is literal "40" for example, we would get "20 40" instead (20=1byte, 40=value);
       }
       when ('2D0B') {
           say "FIXME - parse 2D0B";
       }
       when ('3D04') {
-          my $noise = hex get_varvar();
-          my $n2 = hex get_varvar();
-          my $freq = hex get_varvar();
-          my $gain = hex get_byte(1);
+          my $noise = hex get_var();
+          my $n2 = hex get_var();
+          my $freq = hex get_var();
+          my $gain = hex get_var();
           say "parsed 0x$CMD$SUB: AGC: noise $noise $n2 freq $freq gain $gain";
       }
 
       when ('4E0B') {
-          my $label = hex get_varvar();
-          my $sv = hex get_byte(1);
-          my $ch = hex get_byte(1);
-          my $cno= hex get_varvar();
-          my $sync = hex get_byte(1);
-          my $val = hex get_byte(1);
-          my $frq = hex get_varvar();
+          my $label = hex get_var();
+          my $sv = hex get_var();
+          my $ch = hex get_var();
+          my $cno= hex get_var();
+          my $sync = hex get_var();
+          my $val = hex get_var();
+          my $frq = hex get_var();
           my $rest = get_byte(6);
           say "parsed 0x$CMD$SUB: $label TRACK: StartTrack sv$sv ch $ch cno$cno sync$sync val$val frq$frq -- FIXME rest: $rest";
       }
