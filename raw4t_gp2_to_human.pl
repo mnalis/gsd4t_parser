@@ -124,11 +124,23 @@ sub parsed($) {
 while (<>) {
   next if /^\s*$/;	# skip empty lines
   next if /^\s*#/;	# skip comment lines
-  if (m{^(\d{2}/\d{2}/\d{4}) (\d{2}:\d{2}:\d{2})(\.\d{3}) \(0\) E1 0A ([A-F0-9 ]+)\s*}) {
+  if (m{^(\d{2}/\d{2}/\d{4}) (\d{2}:\d{2}:\d{2})(\.\d{3}) \(0\) ([A-F0-9 ]*)\h*(\h+.*?)?$}) {
     print "raw: $_" if $DEBUG > 8;
     my $date = $1; my $time = $2; my $msec=$3; 
     $packet = $4;
+    my $comments = $5;
     @data = split ' ', $packet;
+    
+    if (!@data) {
+        say "$time$msec skipping empty packet -- $comments" if $DEBUG > 2;
+        next;
+    }
+    my $LEAD_IN = (shift @data) . (shift @data);
+    if ($LEAD_IN ne 'E10A') {
+        print "$time$msec skipping currently unusupported LEAD-IN $LEAD_IN: $_";
+        next;
+    }
+    
     $CMD = shift @data;
     $SUB = shift @data;
     my $expected_len = hex(shift @data);
@@ -141,7 +153,7 @@ while (<>) {
         next;
     }
     
-    say "  $time $CMD $SUB ($expected_len) $rest" if $DEBUG > 3;
+    say "  $time $LEAD_IN $CMD $SUB ($expected_len) $rest" if $DEBUG > 3;
     
     print "$time$msec ";
 
@@ -214,6 +226,6 @@ while (<>) {
       die "finished decoding packet, but data still remains: @data";
     }    
   } else {
-    warn "# WARNING: unknown format for line (maybe not E1 0A - FIXME): $_";
+    die "FATAL: unknown format for line: $_";
   }
 }
