@@ -201,3 +201,18 @@ E1 0A -- lead-in (although there seems to be others, like 84, 8E etc... find the
  01 75 F1 -- frq95729
  04 48 57 54 4C 00 -- ?
 
+--- CM:X0:LastCal ---
+00/00/0006 16:21:34.280 (0) E1 0A 54 94 23 20 B4 01 60 01 77 18 20 54 40 27 AA C0 00 00 00 00 40 B7 FD 66 C0 00 00 00 20 8E 40 0F 6B 14 01 	# seq1=000A seq2=0002 len=0025
+16:21:34.281 DEV TEXT(44/E1):   180 CM:XO:LastCal:1 freq:96024 freqUnc:84 rD:11.833496 rT:6141.401367 tr:142 uG:3947 fHC:20 mD:1
+
+00/00/0006 16:21:34.280 (0) E1 0A 54 94 23 
+20 B4  - 180
+01 - CM:XO:LastCal:1
+60  01 77 18  -- freq:96024
+20 54 - freqUnc:84
+40 27 AA C0 00 00 00 00  -- double float?
+40 B7 FD 66 C0 00 00 00  -- double float?
+20  8E - tr:142
+40 0F 6B - uG: 3947
+14 - fHC:20
+01 - mD:1 	# seq1=000A seq2=0002 len=0025

@@ -70,6 +70,16 @@ sub get_float() {
     return float get_byte(4);
 }
 
+# returns double-precision floating point number from packet (encoded as 8-byte)
+sub get_double() {
+    sub double($) {	# returns double precision floating point representation
+        my ($h) = @_;
+        my @h2 = reverse map "$_", $h =~ /(..)/g;
+        return sprintf("%.6f", unpack "d*", pack "H*", join('',@h2));	# convert (assumed) 8 hex bytes in IEEE-754 double precision floating point. beware of the endian issues!
+    }
+    return double get_byte(8);
+}
+
 
 ######### MAIN ##########
 while (<>) {
@@ -90,8 +100,6 @@ while (<>) {
         # FIXME - sometimes length is not what it seems?
         next;
     }
-    
-    
     
     say "  $time $CMD $SUB ($expected_len) $rest" if $DEBUG > 3;
     
@@ -127,9 +135,24 @@ while (<>) {
           my $rest = get_byte(6);
           say "parsed 0x$CMD$SUB: $label TRACK: StartTrack sv$sv ch $ch cno$cno sync$sync val$val frq$frq -- FIXME rest: $rest";
       }
+      
+      when ('5494') {
+          get_hexvars (my $label, my $lastcal, my $freq, my $freqUnc);
+          my $rD = get_double();
+          my $rT = get_double();
+          get_hexvars (my $tr, my $uG, my $fHC, my $mD);
+          say "parsed 0x$CMD$SUB: $label CM:XO:LastCal:$lastcal freq:$freq freqUnc:$freqUnc rD:$rD rT:$rT tr:$tr uG:$uG fHC:$fHC mD:$mD";
+      }
 
       default {
         say "skip unknown CMD 0x$CMD SUB 0x$SUB $rest" if $DEBUG > 0;
+        my $count=0;
+        while (@data) {
+            my $unknown = get_var();
+            my $unk_dec = hex($unknown);
+            say "    unknown var$count = 0x$unknown ($unk_dec)"; 
+            $count++;
+        }
         next;
       }
     }
