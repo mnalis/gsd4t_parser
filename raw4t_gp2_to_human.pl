@@ -136,6 +136,11 @@ while (<>) {
           say "parsed 0x$CMD$SUB: $label TRACK: StartTrack sv$sv ch $ch cno$cno sync$sync val$val frq$frq -- FIXME rest: $rest";
       }
       
+      when ('5493') {
+          get_hexvars (my $label, my $tVal, my $wn, my $freq, my $freqEst, my $uTNEst, my $uMN, my $uMF, my $uTN, my $uTF, my $uAN, my $uAF, my $uN, my $uF);
+          say "parsed 0x$CMD$SUB: $label CM:XO:Upd:tVal:$tVal wn:$wn freq:$freq freqEst:$freqEst uTNEst:$uTNEst uMN:$uMN uMF:$uMF uTN:$uTN uTF:$uTF uAN:$uAN uAF:$uAF uN:$uN uF:$uF";
+      }
+      
       when ('5494') {
           get_hexvars (my $label, my $lastcal, my $freq, my $freqUnc);
           my $rD = get_double();
@@ -153,6 +158,7 @@ while (<>) {
             say "    unknown var$count = 0x$unknown ($unk_dec)"; 
             $count++;
         }
+        die "FIXME please parse and add this command code $CMD $SUB";
         next;
       }
     }
