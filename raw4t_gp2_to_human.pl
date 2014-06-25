@@ -21,7 +21,9 @@ $| = 1;
 # 40....F8 -- rest of payload
 # #comments
 
-my @data=();
+my @data=();	# whole packet
+my $CMD;	# command/MID equivalent
+my $SUB;	# subcommand/SID equivalent
 
 # returns n-byte value
 sub get_byte($) {
@@ -80,6 +82,34 @@ sub get_double() {
     return double get_byte(8);
 }
 
+# given format string, returns debug text describing packet. 
+# uses sprintf(3)-alike templates:
+#   %u is variable length unsigned decimal
+#   %d is variable length signed decimal
+#   %f is 4-byte float
+#   %g is 8-byte double
+#   %c is 1-byte char
+#   %x is 1-byte hex value
+sub parsed($) {
+    # FIXME - maybe we should just use sprintf() instead trying to reinvent it badly?
+    sub parse_one($) {		# fetches from packet and parses one format variable
+        my ($format) = @_;
+        say "     parse_one: %$format" if $DEBUG > 9;
+        given ($format) {
+            when ('u') { return hex get_var() }
+            when ('d') { return signhex get_var() }
+            when ('f') { return get_float() }
+            when ('g') { return get_double() }
+            when ('c') { return chr hex get_var() }
+            when ('x') { return get_var() }
+            default { die "parse_one: unknown format char %$format" }
+        }
+    }
+    my ($str) = @_;
+    $str =~ s/%(.)/parse_one($1)/ge;
+    if ($str =~ /%/) { die "unknown format parametar in $str" }
+    return "parsed 0x$CMD$SUB: $str";
+}
 
 ######### MAIN ##########
 while (<>) {
@@ -89,8 +119,8 @@ while (<>) {
     print "raw: $_" if $DEBUG > 8;
     my $date = $1; my $time = $2; my $msec=$3; 
     @data = split ' ', $4;
-    my $CMD = shift @data;
-    my $SUB = shift @data;
+    $CMD = shift @data;
+    $SUB = shift @data;
     my $expected_len = hex(shift @data);
     my $rest = join '', @data;
     
@@ -107,50 +137,33 @@ while (<>) {
 
     given ("$CMD$SUB") {
       when ('2D03') {
-          get_hexvars (my $label, my $new, my $type, my $sv, my $ch, my $D);
-          my $C = signhex get_var();
-          get_hexvars (my $c2, my $c3);
-          say "parsed 0x$CMD$SUB: $label ACQ: New$new type$type sv$sv ch$ch D:$D C:$C $c2 $c3";
+          say parsed "%u ACQ: New%u type%u sv%u ch%u D:%u C:%d %u %u";
       }
     
       when ('2D0B') {
-          my $label = hex get_var();
-          my $S = chr(hex get_var());
-          get_hexvars(my $s, my $sv, my $ch, my $cn0, my $D, my $d2);
-          my $C = get_float();
-          my $c2 = get_float();
-          get_hexvars(my $th, my $t2, my $pk, my $p2, my $p3);
-          my $p4 = get_var();	# FIXME is this ok? one byte, but we should get '0000'... huh
-          get_hexvars (my $ms, my $vo, my $bs, my $b2, my $b3, my $b4);
-          say "parsed 0x$CMD$SUB: $label ACQ: $S$s sv$sv ch$ch CN0:$cn0 D:$D  $d2 C:$C $c2 Th:$th $t2 Pk:$pk $p2 $p3 $p4 ms:$ms vo:$vo bs:$bs $b2 $b3 $b4";
+          # FIXME is "%x" before "ms:"  ok? one byte, but we should get '0000'... huh
+          say parsed "%u ACQ: %c%u sv%u ch%u CN0:%u D:%u  %u C:%f %f Th:%u %u Pk:%u %u %u %x ms:%u vo:%u bs:%u %u %u %u";
       }
     
       when ('3D04') {
-          get_hexvars (my $noise, my $n2, my $freq, my $gain);
-          say "parsed 0x$CMD$SUB: AGC: noise $noise $n2 freq $freq gain $gain";
+          say parsed "AGC: noise %u %u freq %u gain %u";
       }
 
       when ('4E0B') {
-          get_hexvars (my $label, my $sv, my $ch, my $cno, my $sync, my $val, my $frq);
-          my $rest = get_byte(6);
-          say "parsed 0x$CMD$SUB: $label TRACK: StartTrack sv$sv ch $ch cno$cno sync$sync val$val frq$frq -- FIXME rest: $rest";
+          say parsed "%u TRACK: StartTrack sv%u ch %u cno%u sync%u val%u frq%u -- FIXME rest: %x%x%x%x%x%x";
       }
       
       when ('5493') {
-          get_hexvars (my $label, my $tVal, my $wn, my $freq, my $freqEst, my $uTNEst, my $uMN, my $uMF, my $uTN, my $uTF, my $uAN, my $uAF, my $uN, my $uF);
-          say "parsed 0x$CMD$SUB: $label CM:XO:Upd:tVal:$tVal wn:$wn freq:$freq freqEst:$freqEst uTNEst:$uTNEst uMN:$uMN uMF:$uMF uTN:$uTN uTF:$uTF uAN:$uAN uAF:$uAF uN:$uN uF:$uF";
+          say parsed "%u CM:XO:Upd:tVal:%u wn:%u freq:%u freqEst:%u uTNEst:%u uMN:%u uMF:%u uTN:%u uTF:%u uAN:%u uAF:%u uN:%u uF:%u";
       }
       
       when ('5494') {
-          get_hexvars (my $label, my $lastcal, my $freq, my $freqUnc);
-          my $rD = get_double();
-          my $rT = get_double();
-          get_hexvars (my $tr, my $uG, my $fHC, my $mD);
-          say "parsed 0x$CMD$SUB: $label CM:XO:LastCal:$lastcal freq:$freq freqUnc:$freqUnc rD:$rD rT:$rT tr:$tr uG:$uG fHC:$fHC mD:$mD";
+          say parsed "%u CM:XO:LastCal:%u freq:%u freqUnc:%u rD:%g rT:%g tr:%u uG:%u fHC:%u mD:%u";
       }
 
       default {
         say "skip unknown CMD 0x$CMD SUB 0x$SUB $rest" if $DEBUG > 0;
+        next; # FIXME DELME
         my $count=0;
         while (@data) {
             my $unknown = get_var();
@@ -158,7 +171,7 @@ while (<>) {
             say "    unknown var$count = 0x$unknown ($unk_dec)"; 
             $count++;
         }
-        die "FIXME please parse and add this command code $CMD $SUB";
+        # die "FIXME please parse and add this command code $CMD $SUB";
         next;
       }
     }
