@@ -170,6 +170,10 @@ while (<>) {
       when ('4E0B') {
           say parsed "%u TRACK: StartTrack sv%u ch%u cno%u sync%u val%u frq%u -- FIXME rest: %X %X %X %X %X %X";
       }
+
+      when ('5413') {
+          say parsed "CM:RtcGetPrecise: rtcCal:%g rtcDft:%g rtcTT:%g Dt:%g rtcCnt:%u rtcAcq:%u tUnc:%g towCal:%g tow:%g cd:%u";
+      }
       
       when ('5426') {
           say parsed "%u CM:RtcEdgeAlign T:%u dRate:%u count:%u %u Acq:%u Wclk:%u dRtc:%g prevAcq:%u bepDrift:%g rtcDrift:%g";
