@@ -153,7 +153,7 @@ F0 -- Pk:240
  60 -- next value 3bytes
  01 7A C8 -- D:96968
  00 -- 0
- 42 FF A5 BA -- C:127.82
+ 42 FF A5 BA -- C:127.82 (floats as IEEE 754, but have to fix endiannes)
  00 00 00 00 -- 0.00
  20 -- next value 1byte
  B1 -- Th:177

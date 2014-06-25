@@ -54,6 +54,12 @@ sub signhex($) {
     return $ret;
 }
 
+# returns floating point representation
+sub float($) {
+    my ($h) = @_;
+    return sprintf("%.2f", unpack "f*", pack "N*", unpack "V*", pack "H*", $h);	# convert (assumed) 4 hex bytes in IEEE-754 floating point. beware of the endian issues!
+}
+
 ######### MAIN ##########
 while (<>) {
   next if /^\s*$/;	# skip empty lines
@@ -93,9 +99,34 @@ while (<>) {
           my $c3 = hex get_var();
           say "parsed 0x$CMD$SUB: $label ACQ: New$new type$type sv$sv ch$ch D:$D C:$C $c2 $c3";
       }
+    
       when ('2D0B') {
-          say "FIXME - parse 2D0B";
+          my $label = hex get_var();
+          my $S = chr(hex get_var());
+          my $s = hex get_var();
+          my $sv = hex get_var();
+          my $ch = hex get_var();
+          my $cn0 = hex get_var();
+          my $D = hex get_var();
+          my $d2 = hex get_var();
+          my $C = float get_byte(4);
+          my $c2 = float get_byte(4);
+          my $th = hex get_var();
+          my $t2 = hex get_var();
+          my $pk = hex get_var();
+          my $p2 = hex get_var();
+          my $p3 = hex get_var();
+          my $p4 = get_var();	# FIXME is this ok? one byte, but we should get '0000'... huh
+          my $ms = hex get_var();
+          my $vo = hex get_var();
+          my $bs = hex get_var();
+          my $b2 = hex get_var();
+          my $b3 = hex get_var();
+          my $b4 = hex get_var();
+	#16:21:37.102 DEV TEXT(44/E1):  2800 ACQ: S5 sv25 ch41 CN0:17 D:96968  0 C:127.82 0.00 Th:177 0 Pk:261 4 3 0000 ms:0 vo:0 bs:0 2451 4868067 88
+          say "parsed 0x$CMD$SUB: $label ACQ: $S$s sv$sv ch$ch CN0:$cn0 D:$D  $d2 C:$C $c2 Th:$th $t2 Pk:$pk $p2 $p3 $p4 ms:$ms vo:$vo bs:$bs $b2 $b3 $b4";
       }
+    
       when ('3D04') {
           my $noise = hex get_var();
           my $n2 = hex get_var();
