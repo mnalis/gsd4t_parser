@@ -21,7 +21,8 @@ $| = 1;
 # 40....F8 -- rest of payload
 # #comments
 
-my @data=();	# whole packet
+my $packet;	# whole packet
+my @data=();	# split packet
 my $CMD;	# command/MID equivalent
 my $SUB;	# subcommand/SID equivalent
 
@@ -30,7 +31,11 @@ sub get_byte($) {
     my ($count) = @_;
     my $ret = '';
     print "   reading $count byte-value: 0x" if $DEBUG > 6;
-    while ($count--) { $ret .= shift @data }
+    while ($count--) {
+        my $h = shift @data;
+        if (!defined $h) { die "not enough data in packet, at least " . ($count+1) . " missing -- read so far: $ret. Full packet data: $packet" }
+        $ret .= $h;
+    }
     say "$ret" if $DEBUG > 6;
     return $ret;
 }
@@ -86,10 +91,11 @@ sub get_double() {
 # uses sprintf(3)-alike templates:
 #   %u is variable length unsigned decimal
 #   %d is variable length signed decimal
+#   %x is variable length unsigned hexadecimal
 #   %f is 4-byte float
 #   %g is 8-byte double
 #   %c is 1-byte char
-#   %x is 1-byte hex value
+#   %X (special) is 1-byte hex value
 #   %0 (special) - read 1-byte value and discard it, not printing anything
 sub parsed($) {
     # FIXME - maybe we should just use sprintf() instead trying to reinvent it badly?
@@ -99,10 +105,11 @@ sub parsed($) {
         given ($format) {
             when ('u') { return hex get_var() }
             when ('d') { return signhex get_var() }
+            when ('x') { return get_var() }
             when ('f') { return get_float() }
             when ('g') { return get_double() }
             when ('c') { return chr hex get_var() }
-            when ('x') { return get_var() }
+            when ('X') { return get_byte(1) }
             when ('0') { get_byte(1); return '' }
             default { die "parse_one: unknown format char %$format" }
         }
@@ -120,7 +127,8 @@ while (<>) {
   if (m{^(\d{2}/\d{2}/\d{4}) (\d{2}:\d{2}:\d{2})(\.\d{3}) \(0\) E1 0A ([A-F0-9 ]+)\s*}) {
     print "raw: $_" if $DEBUG > 8;
     my $date = $1; my $time = $2; my $msec=$3; 
-    @data = split ' ', $4;
+    $packet = $4;
+    @data = split ' ', $packet;
     $CMD = shift @data;
     $SUB = shift @data;
     my $expected_len = hex(shift @data);
@@ -138,6 +146,11 @@ while (<>) {
     print "$time$msec ";
 
     given ("$CMD$SUB") {
+      when ('1F01') {
+          say parsed "%u ATX PP: Seq:%u Mode:%u Ev:0x%x A:%u SVList:0x%x 0x%x SVs:%u %u %u %u %u %u %u %u %u %u %u %u %u %u %u";
+          die "FIXME";
+      }
+
       when ('2D03') {
           say parsed "%u ACQ: New%u type%u sv%u ch%u D:%u C:%d %u %u";
       }
@@ -152,7 +165,7 @@ while (<>) {
       }
 
       when ('4E0B') {
-          say parsed "%u TRACK: StartTrack sv%u ch%u cno%u sync%u val%u frq%u -- FIXME rest: %x %x %x %x %x %x";
+          say parsed "%u TRACK: StartTrack sv%u ch%u cno%u sync%u val%u frq%u -- FIXME rest: %X %X %X %X %X %X";
       }
       
       when ('5426') {
@@ -186,7 +199,7 @@ while (<>) {
             }
             $count++;
         }
-        die "FIXME this cmdcode" if "$CMD$SUB" eq '69AB';
+        die "FIXME this cmdcode" if "$CMD$SUB" eq '1F01';
         # die "FIXME please parse and add this command code $CMD $SUB";
         next;
       }
