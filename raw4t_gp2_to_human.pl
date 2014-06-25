@@ -148,7 +148,6 @@ while (<>) {
     given ("$CMD$SUB") {
       when ('1F01') {
           say parsed "%u ATX PP: Seq:%u Mode:%u Ev:0x%x A:%u SVList:0x%x 0x%x SVs:%u %u %u %u %u %u %u %u %u %u %u %u %u %u %u";
-          die "FIXME";
       }
 
       when ('2D03') {
@@ -199,7 +198,7 @@ while (<>) {
             }
             $count++;
         }
-        die "FIXME this cmdcode" if "$CMD$SUB" eq '1F01';
+        # die "FIXME this cmdcode" if "$CMD$SUB" eq '1F01';
         # die "FIXME please parse and add this command code $CMD $SUB";
         next;
       }
