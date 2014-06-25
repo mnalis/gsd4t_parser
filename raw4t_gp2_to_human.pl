@@ -130,7 +130,7 @@ sub parse_subpackets ($$) {
       my $sCMD = get_byte(1);
       my $sSUB = get_byte(1);
       my $sLEN = get_byte(1);
-      if ("$sCMD$sSUB" ne '1422' or $sLEN != 5) { die "don't understand 0x1420 subpacket 0x$sCMD$sSUB($sLEN)" }
+      if ("$sCMD$sSUB" ne $cmd_sub or $sLEN != $len_sub) { die "don't understand 0x1420 subpacket 0x$sCMD$sSUB($sLEN) -- should be 0x$cmd_sub($len_sub)" }
       my $sDATA = get_byte ($sLEN-3);	# sCMD+sSUB+sLEN have already been read
       
       foreach my $d (map "$_", $sDATA =~ /(..)/g) {
@@ -180,6 +180,16 @@ while (<>) {
       when ('1420') {
           print parsed "%u ChdevsA: ";
           say parse_subpackets('1422', 5);
+      }
+
+      when ('1421') {
+          print parsed "%u ChdevsB: ";
+          say parse_subpackets('1422', 5);
+      }
+
+      when ('1423') {
+          print parsed "%u SSPa:%u: ";
+          say parse_subpackets('1425', 6);
       }
           
       
