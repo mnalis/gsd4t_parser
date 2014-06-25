@@ -150,6 +150,10 @@ while (<>) {
           say parsed "%u ATX PP: Seq:%u Mode:%u Ev:0x%x A:%u SVList:0x%x 0x%x SVs:%u %u %u %u %u %u %u %u %u %u %u %u %u %u %u";
       }
 
+      when ('2208') {
+          say parsed "%u ACQ: New%u type%u sv%u ch %u D:%u C:%d cno%u t %u ms %u bn %u";
+      }
+
       when ('2D03') {
           say parsed "%u ACQ: New%u type%u sv%u ch%u D:%u C:%d %u %u";
       }
@@ -182,6 +186,7 @@ while (<>) {
       when ('69AB') {
           say parsed "%u ATX: Meas Send:%u %u %u %u %u %u %u %u";
       }
+
 
       default {
         say "skip unknown CMD 0x$CMD SUB 0x$SUB $rest" if $DEBUG > 0;
