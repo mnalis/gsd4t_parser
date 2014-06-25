@@ -46,6 +46,13 @@ sub get_var() {
     return $size;	# if no special prefix for size, then it is our one-byte value!
 }
 
+# fills vars passed as reference with hex values of get_var()
+sub get_hexvars {
+    foreach my $ref (@_) {
+        $ref = hex get_var();
+    }
+}
+
 # like hex(), but autodetect signed values
 sub signhex($) {
     my ($h) = @_;
@@ -54,11 +61,15 @@ sub signhex($) {
     return $ret;
 }
 
-# returns floating point representation
-sub float($) {
-    my ($h) = @_;
-    return sprintf("%.2f", unpack "f*", pack "N*", unpack "V*", pack "H*", $h);	# convert (assumed) 4 hex bytes in IEEE-754 floating point. beware of the endian issues!
+# returns floating point number from packet (encoded as 4-byte)
+sub get_float() {
+    sub float($) {	# returns floating point representation
+        my ($h) = @_;
+        return sprintf("%.2f", unpack "f*", pack "N*", unpack "V*", pack "H*", $h);	# convert (assumed) 4 hex bytes in IEEE-754 floating point. beware of the endian issues!
+    }
+    return float get_byte(4);
 }
+
 
 ######### MAIN ##########
 while (<>) {
@@ -88,61 +99,31 @@ while (<>) {
 
     given ("$CMD$SUB") {
       when ('2D03') {
-          my $label = hex get_var();
-          my $new = hex get_var();
-          my $type = hex get_var();
-          my $sv = hex get_var();
-          my $ch = hex get_var();
-          my $D = hex get_var();
+          get_hexvars (my $label, my $new, my $type, my $sv, my $ch, my $D);
           my $C = signhex get_var();
-          my $c2 = hex get_var();
-          my $c3 = hex get_var();
+          get_hexvars (my $c2, my $c3);
           say "parsed 0x$CMD$SUB: $label ACQ: New$new type$type sv$sv ch$ch D:$D C:$C $c2 $c3";
       }
     
       when ('2D0B') {
           my $label = hex get_var();
           my $S = chr(hex get_var());
-          my $s = hex get_var();
-          my $sv = hex get_var();
-          my $ch = hex get_var();
-          my $cn0 = hex get_var();
-          my $D = hex get_var();
-          my $d2 = hex get_var();
-          my $C = float get_byte(4);
-          my $c2 = float get_byte(4);
-          my $th = hex get_var();
-          my $t2 = hex get_var();
-          my $pk = hex get_var();
-          my $p2 = hex get_var();
-          my $p3 = hex get_var();
+          get_hexvars(my $s, my $sv, my $ch, my $cn0, my $D, my $d2);
+          my $C = get_float();
+          my $c2 = get_float();
+          get_hexvars(my $th, my $t2, my $pk, my $p2, my $p3);
           my $p4 = get_var();	# FIXME is this ok? one byte, but we should get '0000'... huh
-          my $ms = hex get_var();
-          my $vo = hex get_var();
-          my $bs = hex get_var();
-          my $b2 = hex get_var();
-          my $b3 = hex get_var();
-          my $b4 = hex get_var();
-	#16:21:37.102 DEV TEXT(44/E1):  2800 ACQ: S5 sv25 ch41 CN0:17 D:96968  0 C:127.82 0.00 Th:177 0 Pk:261 4 3 0000 ms:0 vo:0 bs:0 2451 4868067 88
+          get_hexvars (my $ms, my $vo, my $bs, my $b2, my $b3, my $b4);
           say "parsed 0x$CMD$SUB: $label ACQ: $S$s sv$sv ch$ch CN0:$cn0 D:$D  $d2 C:$C $c2 Th:$th $t2 Pk:$pk $p2 $p3 $p4 ms:$ms vo:$vo bs:$bs $b2 $b3 $b4";
       }
     
       when ('3D04') {
-          my $noise = hex get_var();
-          my $n2 = hex get_var();
-          my $freq = hex get_var();
-          my $gain = hex get_var();
+          get_hexvars (my $noise, my $n2, my $freq, my $gain);
           say "parsed 0x$CMD$SUB: AGC: noise $noise $n2 freq $freq gain $gain";
       }
 
       when ('4E0B') {
-          my $label = hex get_var();
-          my $sv = hex get_var();
-          my $ch = hex get_var();
-          my $cno= hex get_var();
-          my $sync = hex get_var();
-          my $val = hex get_var();
-          my $frq = hex get_var();
+          get_hexvars (my $label, my $sv, my $ch, my $cno, my $sync, my $val, my $frq);
           my $rest = get_byte(6);
           say "parsed 0x$CMD$SUB: $label TRACK: StartTrack sv$sv ch $ch cno$cno sync$sync val$val frq$frq -- FIXME rest: $rest";
       }
@@ -153,7 +134,7 @@ while (<>) {
       }
     }
     
-    # if we parsed packet, there should be NO data remaining...
+    # if we parsed packet ccrrectly, there should be NO data remaining...
     if (@data) {
       die "finished decoding packet, but data still remains: @data";
     }    
