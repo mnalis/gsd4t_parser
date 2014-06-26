@@ -156,15 +156,12 @@ while (<>) {
     @data = split ' ', $packet;
     
     if (!@data) {
-        say "$time$msec skipping empty packet -- $comments" if $DEBUG > 2;
+        say "$time$msec skipping empty packet  $comments" if $DEBUG > 2;
         next;
     }
     my $LEAD_IN = get_byte(2);
-    if ($LEAD_IN ne 'E10A') {
-        print "$time$msec skipping currently unusupported LEAD-IN $LEAD_IN: $_";
-        next;
-    }
     
+    if ($LEAD_IN eq 'E10A' or $LEAD_IN eq 'E109' ) {	# FIXME indent properly
     $CMD = get_byte(1);
     $SUB = get_byte(1);
     $expected_len = hex get_byte(1);
@@ -238,9 +235,12 @@ while (<>) {
           say parsed "%u ATX: Meas Send:%u %u %u %u %u %u %u %u";
       }
 
+      
+      #### FIXME: E109 uses much of the same infrastucture as E10A, so we keep it here, and hope for no same CMD/SUB pairs :) ####
+      
 
       default {
-        say "skip unknown CMD 0x$CMD SUB 0x$SUB $rest" if $DEBUG > 0;
+        say "skip lead-in 0x$LEAD_IN unknown CMD 0x$CMD SUB 0x$SUB $rest" if $DEBUG > 0;
         #next; # FIXME DELME
         my $count=0;
         while (@data) {
@@ -267,6 +267,14 @@ while (<>) {
 
     if ($real_len != $expected_len) {
         die "FATAL: invalid length - found $real_len, expected $expected_len: $_";	
+    }
+    
+    } elsif ($LEAD_IN =~ /^81..$/) {	# FIXME indent properly
+        say "$time$msec unknown empty-load LEAD-IN of 0x$LEAD_IN";
+        if (@data) { die "finished decoding packet, but data still remains: @data" }
+    } else {
+        print "$time$msec currently unusupported LEAD-IN $LEAD_IN: $_";
+        next;
     }
 
   } else {
