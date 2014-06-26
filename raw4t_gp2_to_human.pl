@@ -200,7 +200,30 @@ while (<>) {
           say parse_subpackets('1425', 6);
       }
           
-      
+      when ('1A00') {
+          say parsed "%u SSS: Start. %x sssMode%u preposMode %u"; 
+      }
+
+      when ('1E04') {
+          say parsed "%u SSS: Commanded l:%u h:%u new:%x";
+      }
+
+      when ('1E0B') {
+          say parsed "%u ATX: Insample ADC select: %u"; 
+      }
+
+      when ('1E0D') {
+          say parsed "%u ATX: Insample mode switch: Mode:%u Ins:%u status=0x%x"; 
+      }
+
+      when ('1E0F') {
+          say parsed "%u ATX: Insample Switch Request: Evt:0x%x oldIns:%u newIns:%u"; 
+      }
+
+      when ('1F00') {
+          say parsed "%u ATX Init: Seq:%u Mode:%u Ev:0x%x SVList:0x%x 0x%x SVs:%u %u %u %u %u %u %u %u %u %u %u %u %u %u %u";
+      }
+
       when ('1F01') {
           say parsed "%u ATX PP: Seq:%u Mode:%u Ev:0x%x A:%u SVList:0x%x 0x%x SVs:%u %u %u %u %u %u %u %u %u %u %u %u %u %u %u";
       }
@@ -225,6 +248,10 @@ while (<>) {
       when ('4E0B') {
           say parsed "%u TRACK: StartTrack sv%u ch%u cno%u sync%u val%u frq%u -- FIXME rest: %X %X %X %X %X %X";
       }
+      when ('5400') {
+          say parsed "%u BEP:SetTime(RTC) YY T:%g %u %u A:%u AC:%f Adj:%g dCB:%f";
+      }
+
 
       when ('5413') {
           say parsed "CM:RtcGetPrecise: rtcCal:%g rtcDft:%g rtcTT:%g Dt:%g rtcCnt:%u rtcAcq:%u tUnc:%g towCal:%g tow:%g cd:%u";
@@ -240,6 +267,10 @@ while (<>) {
       
       when ('5494') {
           say parsed "%u CM:XO:LastCal:%u freq:%u freqUnc:%u rD:%g rT:%g tr:%u uG:%u fHC:%u mD:%u";
+      }
+      
+      when ('5495') {
+          say parsed "%u CM:XoRampRateCheck:%u reset:%u rr:%u dTemp:%u dt:%u t:%u to:%u";
       }
 
       when ('69AB') {
