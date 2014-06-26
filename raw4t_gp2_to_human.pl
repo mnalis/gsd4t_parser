@@ -110,7 +110,7 @@ sub parsed($) {
             when ('x') { return get_var() }
             when ('f') { return get_float() }
             when ('g') { return get_double() }
-            when ('c') { return chr hex get_byte(1) }
+            when ('c') { return chr hex get_var() }
             when ('s') { my $r=''; while (my $c=hex get_byte(1)) { $r .= chr $c }; return $r }
             when ('X') { return get_byte(1) }
             when ('0') { get_byte(1); return '' }
