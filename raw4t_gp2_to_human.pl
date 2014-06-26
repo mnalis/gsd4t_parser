@@ -296,10 +296,18 @@ while (<>) {
           if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
           say parsed "(guess) Config: RefClk: %u Hz ClkOffset: %u Hz Unc: %u ppb Lna: %s Baud: %u Backup LDO: %s";
       }
-
-      when ('5804') { say parsed "CPU Speed: %s    Cache: %s"; }
-      when ('5E09') { say parsed "%s"; }
-      when ('5700') { say parsed "%s"; }
+      when ('5804') { 
+          if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
+  	  say parsed "CPU Speed: %s    Cache: %s"; 
+      }
+      when ('5E09') { 
+          if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
+	  say parsed "%s"; 
+      }
+      when ('5700') {
+          if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
+          say parsed "%s"; 
+      }
       #### FIXME: end E109 command block ####
       
 
