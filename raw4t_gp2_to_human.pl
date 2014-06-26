@@ -25,6 +25,7 @@ my $packet;	# whole packet
 my @data=();	# split packet
 my $CMD;	# command/MID equivalent
 my $SUB;	# subcommand/SID equivalent
+my $expected_len;	# expected total length of packet
 
 # returns n-byte value
 sub get_byte($) {
@@ -95,6 +96,7 @@ sub get_double() {
 #   %f is 4-byte float
 #   %g is 8-byte double
 #   %c is 1-byte char
+#   %s is variable length (AND 0-terminated) array of chars (C string prefixed with length)
 #   %X (special) is 1-byte hex value
 #   %0 (special) - read 1-byte value and discard it, not printing anything
 sub parsed($) {
@@ -109,6 +111,16 @@ sub parsed($) {
             when ('f') { return get_float() }
             when ('g') { return get_double() }
             when ('c') { return chr hex get_var() }
+            when ('s') { 
+                my $size = hex get_byte(1);
+                my $r=''; 
+                while (my $c=hex get_byte(1)) {
+                    $r .= chr $c;
+                    $size--; 
+                }; 
+                if ($size != 0) { die "$size bytes remains in %s of '$r'" }
+                return $r;
+            }
             when ('X') { return get_byte(1) }
             when ('0') { get_byte(1); return '' }
             default { die "parse_one: unknown format char %$format" }
@@ -120,32 +132,74 @@ sub parsed($) {
     return "parsed 0x$CMD$SUB: $str";
 }
 
+# parse unknown number of subpackets
+sub parse_subpackets ($$) {
+  my ($cmd_sub, $len_sub) = @_;
+        
+  my $str = '';
+  while (@data) {
+      my $sCMD = get_byte(1);
+      my $sSUB = get_byte(1);
+      my $sLEN = get_byte(1);
+      if ("$sCMD$sSUB" ne $cmd_sub or $sLEN != $len_sub) { die "don't understand 0x1420 subpacket 0x$sCMD$sSUB($sLEN) -- should be 0x$cmd_sub($len_sub)" }
+      my $sDATA = get_byte ($sLEN-3);	# sCMD+sSUB+sLEN have already been read
+      
+      foreach my $d (map "$_", $sDATA =~ /(..)/g) {
+          $str .= hex($d) . "-";
+      }
+      chop $str; $str .= ' ';
+      
+      $expected_len += $sLEN;
+  }
+  chop $str;
+  return $str;
+}
+
 ######### MAIN ##########
 while (<>) {
   next if /^\s*$/;	# skip empty lines
   next if /^\s*#/;	# skip comment lines
-  if (m{^(\d{2}/\d{2}/\d{4}) (\d{2}:\d{2}:\d{2})(\.\d{3}) \(0\) E1 0A ([A-F0-9 ]+)\s*}) {
+  if (m{^(\d{2}/\d{2}/\d{4}) (\d{2}:\d{2}:\d{2})(\.\d{3}) \(0\) ([A-F0-9 ]*)\h*(\h+.*?)?$}) {
     print "raw: $_" if $DEBUG > 8;
     my $date = $1; my $time = $2; my $msec=$3; 
     $packet = $4;
+    my $comments = $5;
     @data = split ' ', $packet;
-    $CMD = shift @data;
-    $SUB = shift @data;
-    my $expected_len = hex(shift @data);
+    
+    if (!@data) {
+        say "$time$msec empty packet  $comments" if $DEBUG > 2;
+        next;
+    }
+    my $LEAD_IN = get_byte(2);
+    
+    if ($LEAD_IN eq 'E10A' or $LEAD_IN eq 'E109' ) {	# FIXME indent properly
+    $CMD = get_byte(1);
+    $SUB = get_byte(1);
+    $expected_len = hex get_byte(1);
     my $rest = join '', @data;
     
     my $real_len = 3+ scalar @data;		# "expected_len" includes CMD, SUB and expected_len
-    if ($real_len != $expected_len) {
-        warn "WARNING: skipping due to invalid length - found $real_len, expected $expected_len: $_";	
-        # FIXME - sometimes length is not what it seems?
-        next;
-    }
     
-    say "  $time $CMD $SUB ($expected_len) $rest" if $DEBUG > 3;
+    say "  $time $LEAD_IN $CMD $SUB ($expected_len) $rest" if $DEBUG > 3;
     
     print "$time$msec ";
 
     given ("$CMD$SUB") {
+      when ('1420') {
+          print parsed "%u ChdevsA: ";
+          say parse_subpackets('1422', 5);
+      }
+
+      when ('1421') {
+          print parsed "%u ChdevsB: ";
+          say parse_subpackets('1422', 5);
+      }
+
+      when ('1423') {
+          print parsed "%u SSPa:%u: ";
+          say parse_subpackets('1425', 6);
+      }
+          
       when ('1A00') {
           say parsed "%u SSS: Start. %x sssMode%u preposMode %u"; 
       }
@@ -223,9 +277,26 @@ while (<>) {
           say parsed "%u ATX: Meas Send:%u %u %u %u %u %u %u %u";
       }
 
+      
+      #### FIXME: E109 uses much of the same infrastucture as E10A, so we keep it here, and hope for no same CMD/SUB pairs :) ####
+      when ('5800') {
+          if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
+          say parsed "(guess) SiRF GPS SW Version: %s";
+      }
+
+      when ('5802') {
+          if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
+          say parsed "(guess) Compiler: %s";
+      }
+      when ('5803') {
+          if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
+          say parsed "(guess) ASIC %s 0x%x";
+      }
+      #### FIXME: end E109 command block ####
+      
 
       default {
-        say "skip unknown CMD 0x$CMD SUB 0x$SUB $rest" if $DEBUG > 0;
+        say "skip lead-in 0x$LEAD_IN unknown CMD 0x$CMD SUB 0x$SUB $rest" if $DEBUG > 0;
         #next; # FIXME DELME
         my $count=0;
         while (@data) {
@@ -249,7 +320,20 @@ while (<>) {
     if (@data) {
       die "finished decoding packet, but data still remains: @data";
     }    
+
+    if ($real_len != $expected_len) {
+        die "FATAL: invalid length - found $real_len, expected $expected_len: $_";	
+    }
+    
+    } elsif ($LEAD_IN =~ /^81..$/) {	# FIXME indent properly
+        say "$time$msec unknown empty-load LEAD-IN of 0x$LEAD_IN";
+        if (@data) { die "finished decoding packet, but data still remains: @data" }
+    } else {
+        print "$time$msec currently unsupported LEAD-IN $LEAD_IN: $_";
+        next;
+    }
+
   } else {
-    warn "# WARNING: unknown format for line (maybe not E1 0A - FIXME): $_";
+    die "FATAL: unknown format for line: $_";
   }
 }
