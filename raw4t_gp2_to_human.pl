@@ -96,6 +96,7 @@ sub get_double() {
 #   %f is 4-byte float
 #   %g is 8-byte double
 #   %c is 1-byte char
+#   %s is 0-terminated array of chars (C string)
 #   %X (special) is 1-byte hex value
 #   %0 (special) - read 1-byte value and discard it, not printing anything
 sub parsed($) {
@@ -109,7 +110,8 @@ sub parsed($) {
             when ('x') { return get_var() }
             when ('f') { return get_float() }
             when ('g') { return get_double() }
-            when ('c') { return chr hex get_var() }
+            when ('c') { return chr hex get_byte(1) }
+            when ('s') { my $r=''; while (my $c=hex get_byte(1)) { $r .= chr $c }; return $r }
             when ('X') { return get_byte(1) }
             when ('0') { get_byte(1); return '' }
             default { die "parse_one: unknown format char %$format" }
@@ -237,6 +239,11 @@ while (<>) {
 
       
       #### FIXME: E109 uses much of the same infrastucture as E10A, so we keep it here, and hope for no same CMD/SUB pairs :) ####
+      when ('5800') {
+          if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
+          say parsed "(guess) SiRF GPS SW Version: '%s'";
+      }
+      #### FIXME: end E109 command block ####
       
 
       default {
