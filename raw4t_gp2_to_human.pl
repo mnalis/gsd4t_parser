@@ -250,12 +250,16 @@ while (<>) {
       #### FIXME: E109 uses much of the same infrastucture as E10A, so we keep it here, and hope for no same CMD/SUB pairs :) ####
       when ('5800') {
           if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
-          say parsed "(guess) SiRF GPS SW Version: '%s'";
+          say parsed "(guess) SiRF GPS SW Version: %s";
       }
 
       when ('5802') {
           if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
-          say parsed "(guess) Compiler: '%s'";
+          say parsed "(guess) Compiler: %s";
+      }
+      when ('5803') {
+          if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
+          say parsed "(guess) ASIC %s 0x%x";
       }
       #### FIXME: end E109 command block ####
       
