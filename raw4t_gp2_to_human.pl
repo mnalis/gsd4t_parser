@@ -167,7 +167,7 @@ while (<>) {
     @data = split ' ', $packet;
     
     if (!@data) {
-        say "$time$msec skipping empty packet  $comments" if $DEBUG > 2;
+        say "$time$msec empty packet  $comments" if $DEBUG > 2;
         next;
     }
     my $LEAD_IN = get_byte(2);
@@ -298,7 +298,7 @@ while (<>) {
         say "$time$msec unknown empty-load LEAD-IN of 0x$LEAD_IN";
         if (@data) { die "finished decoding packet, but data still remains: @data" }
     } else {
-        print "$time$msec currently unusupported LEAD-IN $LEAD_IN: $_";
+        print "$time$msec currently unsupported LEAD-IN $LEAD_IN: $_";
         next;
     }
 
