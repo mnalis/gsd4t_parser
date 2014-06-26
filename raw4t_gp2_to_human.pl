@@ -96,7 +96,7 @@ sub get_double() {
 #   %f is 4-byte float
 #   %g is 8-byte double
 #   %c is 1-byte char
-#   %s is 0-terminated array of chars (C string)
+#   %s is variable length (AND 0-terminated) array of chars (C string prefixed with length)
 #   %X (special) is 1-byte hex value
 #   %0 (special) - read 1-byte value and discard it, not printing anything
 sub parsed($) {
@@ -111,7 +111,16 @@ sub parsed($) {
             when ('f') { return get_float() }
             when ('g') { return get_double() }
             when ('c') { return chr hex get_var() }
-            when ('s') { my $r=''; while (my $c=hex get_byte(1)) { $r .= chr $c }; return $r }
+            when ('s') { 
+                my $size = hex get_byte(1);
+                my $r=''; 
+                while (my $c=hex get_byte(1)) {
+                    $r .= chr $c;
+                    $size--; 
+                }; 
+                if ($size != 0) { die "$size bytes remains in %s of '$r'" }
+                return $r;
+            }
             when ('X') { return get_byte(1) }
             when ('0') { get_byte(1); return '' }
             default { die "parse_one: unknown format char %$format" }
@@ -242,6 +251,11 @@ while (<>) {
       when ('5800') {
           if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
           say parsed "(guess) SiRF GPS SW Version: '%s'";
+      }
+
+      when ('5802') {
+          if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
+          say parsed "(guess) Compiler: '%s'";
       }
       #### FIXME: end E109 command block ####
       
