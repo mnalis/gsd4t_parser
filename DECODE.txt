@@ -429,7 +429,7 @@ WARNING: skipping due to invalid length - found 131, expected 6: 00/00/0006
 -16:21:39.394 parsed 0x1F01:    5100 ATX PP: Seq:4 Mode:3 Ev:0x120 A:13405894 SVList:0x51102A12 0x00000000 SVs:29 25 31 12 2 14 21 5 10 0 0 0 0 0 0
 +16:21:39.400 DEV TEXT(44/E1):  5100 ATX PP: Seq:4 Mode:3 Ev:0x120 A:13405894 SVList:0x51102a12 0x00000000 SVs:29 25 31 12 2 14 21 5 10 0 0 0 0 0 0
 
-#### This one causes all that shit down! ###
+#### This one packet causes all that stuff down! ###
 16:21:40.138 currently unsupported LEAD-IN 843B: 00/00/0006 16:21:40.138 (0) 
 
 84 3B 00 00 00 00 04 B5 C7 20 00 03 6C FE 37 FD 02 C4 00 00 EE 20 00 00 00 03 00 55 05 DC 00 00 16 A8 07 06 03 00 00 0B 00
