@@ -348,6 +348,10 @@ while (<>) {
         say "$time$msec LEAD-IN of 0x82 is part of SiRFbinary MID 64 (0x40) - Nav Library, SID 1 GPS Data (FIXME - more parsing if we need it)";
     } elsif ($LEAD_IN =~ /^8501$/) {
         say "$time$msec LEAD-IN of 0x$LEAD_IN is part of SiRFbinary MID 8 (0x08) - 50 BPS data subframe, extract leap-second from this (FIXME - more parsing if we need it)";
+    } elsif ($LEAD_IN =~ /^8E01$/) {
+        say "$time$msec LEAD-IN of 0x$LEAD_IN MAYBE related to SiRFbinary MID 92 (0x5C) - CW Controller Output, SID 1! (logically, but no data match found)";
+    } elsif ($LEAD_IN =~ /^8E02$/) {
+        say "$time$msec LEAD-IN of 0x$LEAD_IN equivalent to SiRFbinary MID 92 (0x5C) - CW Controller Output, SID 2! (FIXME - more parsing if we need it)";
     } elsif ($LEAD_IN =~ /^8F0[12]$/) {
         say "$time$msec LEAD-IN of 0x$LEAD_IN equivalent to SiRFbinary MID 93 (0x5D) - TCXO Output! (FIXME - more parsing if we need it)";
     } else {
