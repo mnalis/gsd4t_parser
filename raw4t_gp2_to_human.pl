@@ -344,6 +344,8 @@ while (<>) {
     } elsif ($LEAD_IN =~ /^81..$/) {	# FIXME indent properly
         say "$time$msec unknown empty-load LEAD-IN of 0x$LEAD_IN";
         if (@data) { die "finished decoding packet, but data still remains: @data" }
+    } elsif ($LEAD_IN =~ /^8F0[12]$/) {	# FIXME indent properly
+        say "$time$msec LEAD-IN of 0x$LEAD_IN equivalent to SiRFbinary MID 93 (0x5D) - TCXO Output! (FIXME - more parsing if we need it)";
     } else {
         print "$time$msec currently unsupported LEAD-IN $LEAD_IN: $_";
         next;
