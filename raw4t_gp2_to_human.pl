@@ -344,10 +344,12 @@ while (<>) {
     } elsif ($LEAD_IN =~ /^81..$/) {
         say "$time$msec unknown empty-load LEAD-IN of 0x$LEAD_IN";
         if (@data) { die "finished decoding packet, but data still remains: @data" }
-    } elsif ($LEAD_IN =~ /^8F0[12]$/) {
-        say "$time$msec LEAD-IN of 0x$LEAD_IN equivalent to SiRFbinary MID 93 (0x5D) - TCXO Output! (FIXME - more parsing if we need it)";
     } elsif ($LEAD_IN =~ /^82..$/) {
         say "$time$msec LEAD-IN of 0x82 is part of SiRFbinary MID 64 (0x40) - Nav Library, SID 1 GPS Data (FIXME - more parsing if we need it)";
+    } elsif ($LEAD_IN =~ /^8501$/) {
+        say "$time$msec LEAD-IN of 0x$LEAD_IN is part of SiRFbinary MID 8 (0x08) - 50 BPS data subframe, extract leap-second from this (FIXME - more parsing if we need it)";
+    } elsif ($LEAD_IN =~ /^8F0[12]$/) {
+        say "$time$msec LEAD-IN of 0x$LEAD_IN equivalent to SiRFbinary MID 93 (0x5D) - TCXO Output! (FIXME - more parsing if we need it)";
     } else {
         print "$time$msec currently unsupported LEAD-IN $LEAD_IN: $_";
         next;
