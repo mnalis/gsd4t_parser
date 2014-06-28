@@ -34,6 +34,10 @@ sub getbeu16() {
     return hex get_byte(2);
 }
 
+# returns unsigned integer 8-its
+sub getub() {
+    return hex get_byte(1);
+}
 ######### MAIN ##########
 
 # format is like:
