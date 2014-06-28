@@ -172,179 +172,179 @@ while (<>) {
     }
     my $LEAD_IN = get_byte(2);
     
-    if ($LEAD_IN eq 'E10A' or $LEAD_IN eq 'E109' ) {	# FIXME indent properly
-    $CMD = get_byte(1);
-    $SUB = get_byte(1);
-    $expected_len = hex get_byte(1);
-    my $rest = join '', @data;
-    
-    my $real_len = 3+ scalar @data;		# "expected_len" includes CMD, SUB and expected_len
-    
-    say "  $time $LEAD_IN $CMD $SUB ($expected_len) $rest" if $DEBUG > 3;
-    
-    print "$time$msec ";
+    if ($LEAD_IN eq 'E10A' or $LEAD_IN eq 'E109' ) {
+        $CMD = get_byte(1);
+        $SUB = get_byte(1);
+        $expected_len = hex get_byte(1);
+        my $rest = join '', @data;
+        
+        my $real_len = 3+ scalar @data;		# "expected_len" includes CMD, SUB and expected_len
+        
+        say "  $time $LEAD_IN $CMD $SUB ($expected_len) $rest" if $DEBUG > 3;
+        
+        print "$time$msec ";
 
-    given ("$CMD$SUB") {
-      when ('1420') {
-          print parsed "%u ChdevsA: ";
-          say parse_subpackets('1422', 5);
-      }
+        given ("$CMD$SUB") {
+          when ('1420') {
+              print parsed "%u ChdevsA: ";
+              say parse_subpackets('1422', 5);
+          }
 
-      when ('1421') {
-          print parsed "%u ChdevsB: ";
-          say parse_subpackets('1422', 5);
-      }
+          when ('1421') {
+              print parsed "%u ChdevsB: ";
+              say parse_subpackets('1422', 5);
+          }
 
-      when ('1423') {
-          print parsed "%u SSPa:%u: ";
-          say parse_subpackets('1425', 6);
-      }
+          when ('1423') {
+              print parsed "%u SSPa:%u: ";
+              say parse_subpackets('1425', 6);
+          }
+              
+          when ('1A00') {
+              say parsed "%u SSS: Start. %x sssMode%u preposMode %u"; 
+          }
+
+          when ('1E04') {
+              say parsed "%u SSS: Commanded l:%u h:%u new:%x";
+          }
+
+          when ('1E0B') {
+              say parsed "%u ATX: Insample ADC select: %u"; 
+          }
+
+          when ('1E0D') {
+              say parsed "%u ATX: Insample mode switch: Mode:%u Ins:%u status=0x%x"; 
+          }
+
+          when ('1E0F') {
+              say parsed "%u ATX: Insample Switch Request: Evt:0x%x oldIns:%u newIns:%u"; 
+          }
+
+          when ('1F00') {
+              say parsed "%u ATX Init: Seq:%u Mode:%u Ev:0x%x SVList:0x%x 0x%x SVs:%u %u %u %u %u %u %u %u %u %u %u %u %u %u %u";
+          }
+
+          when ('1F01') {
+              say parsed "%u ATX PP: Seq:%u Mode:%u Ev:0x%x A:%u SVList:0x%x 0x%x SVs:%u %u %u %u %u %u %u %u %u %u %u %u %u %u %u";
+          }
+
+          when ('2208') {
+              say parsed "%u ACQ: New%u type%u sv%u ch %u D:%u C:%d cno%u t %u ms %u bn %u";
+          }
+
+          when ('2D03') {
+              say parsed "%u ACQ: New%u type%u sv%u ch%u D:%u C:%d %u %u";
+          }
+        
+          when ('2D0B') {
+              # FIXME is "%x" before "ms:"  ok? one byte, but we should get '0000'... huh
+              say parsed "%u ACQ: %c%u sv%u ch%u CN0:%u D:%u  %u C:%f %f Th:%u %u Pk:%u %u %u %x ms:%u vo:%u bs:%u %u %u %u";
+          }
+        
+          when ('3D04') {
+              say parsed "AGC: noise %u %u freq %u gain %u";
+          }
+
+          when ('4E0B') {
+              say parsed "%u TRACK: StartTrack sv%u ch%u cno%u sync%u val%u frq%u -- FIXME rest: %X %X %X %X %X %X";
+          }
+          when ('5400') {
+              say parsed "%u BEP:SetTime(RTC) YY T:%g %u %u A:%u AC:%f Adj:%g dCB:%f";
+          }
+
+
+          when ('5413') {
+              say parsed "CM:RtcGetPrecise: rtcCal:%g rtcDft:%g rtcTT:%g Dt:%g rtcCnt:%u rtcAcq:%u tUnc:%g towCal:%g tow:%g cd:%u";
+          }
           
-      when ('1A00') {
-          say parsed "%u SSS: Start. %x sssMode%u preposMode %u"; 
-      }
+          when ('5426') {
+              say parsed "%u CM:RtcEdgeAlign T:%u dRate:%u count:%u %u Acq:%u Wclk:%u dRtc:%g prevAcq:%u bepDrift:%g rtcDrift:%g";
+          }
+          
+          when ('5493') {
+              say parsed "%u CM:XO:Upd:tVal:%u wn:%u freq:%u freqEst:%u uTNEst:%u uMN:%u uMF:%u uTN:%u uTF:%u uAN:%u uAF:%u uN:%u uF:%u";
+          }
+          
+          when ('5494') {
+              say parsed "%u CM:XO:LastCal:%u freq:%u freqUnc:%u rD:%g rT:%g tr:%u uG:%u fHC:%u mD:%u";
+          }
+          
+          when ('5495') {
+              say parsed "%u CM:XoRampRateCheck:%u reset:%u rr:%u dTemp:%u dt:%u t:%u to:%u";
+          }
 
-      when ('1E04') {
-          say parsed "%u SSS: Commanded l:%u h:%u new:%x";
-      }
+          when ('69AB') {
+              say parsed "%u ATX: Meas Send:%u %u %u %u %u %u %u %u";
+          }
 
-      when ('1E0B') {
-          say parsed "%u ATX: Insample ADC select: %u"; 
-      }
+          
+          #### FIXME: E109 uses much of the same infrastucture as E10A, so we keep it here, and hope for no same CMD/SUB pairs :) ####
+          when ('5800') {
+              if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
+              say parsed "(guess) SiRF GPS SW Version: %s";
+          }
 
-      when ('1E0D') {
-          say parsed "%u ATX: Insample mode switch: Mode:%u Ins:%u status=0x%x"; 
-      }
+          when ('5802') {
+              if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
+              say parsed "(guess) Compiler: %s";
+          }
+          when ('5803') {
+              if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
+              say parsed "(guess) ASIC %s 0x%x";
+          }
+          when ('5805') {
+              if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
+              say parsed "(guess) Config: RefClk: %u Hz ClkOffset: %u Hz Unc: %u ppb Lna: %s Baud: %u Backup LDO: %s";
+          }
+          when ('5804') { 
+              if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
+              say parsed "CPU Speed: %s    Cache: %s"; 
+          }
+          when ('5E09') { 
+              if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
+              say parsed "%s"; 
+          }
+          when ('5700') {
+              if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
+              say parsed "%s"; 
+          }
+          #### FIXME: end E109 command block ####
+          
 
-      when ('1E0F') {
-          say parsed "%u ATX: Insample Switch Request: Evt:0x%x oldIns:%u newIns:%u"; 
-      }
-
-      when ('1F00') {
-          say parsed "%u ATX Init: Seq:%u Mode:%u Ev:0x%x SVList:0x%x 0x%x SVs:%u %u %u %u %u %u %u %u %u %u %u %u %u %u %u";
-      }
-
-      when ('1F01') {
-          say parsed "%u ATX PP: Seq:%u Mode:%u Ev:0x%x A:%u SVList:0x%x 0x%x SVs:%u %u %u %u %u %u %u %u %u %u %u %u %u %u %u";
-      }
-
-      when ('2208') {
-          say parsed "%u ACQ: New%u type%u sv%u ch %u D:%u C:%d cno%u t %u ms %u bn %u";
-      }
-
-      when ('2D03') {
-          say parsed "%u ACQ: New%u type%u sv%u ch%u D:%u C:%d %u %u";
-      }
-    
-      when ('2D0B') {
-          # FIXME is "%x" before "ms:"  ok? one byte, but we should get '0000'... huh
-          say parsed "%u ACQ: %c%u sv%u ch%u CN0:%u D:%u  %u C:%f %f Th:%u %u Pk:%u %u %u %x ms:%u vo:%u bs:%u %u %u %u";
-      }
-    
-      when ('3D04') {
-          say parsed "AGC: noise %u %u freq %u gain %u";
-      }
-
-      when ('4E0B') {
-          say parsed "%u TRACK: StartTrack sv%u ch%u cno%u sync%u val%u frq%u -- FIXME rest: %X %X %X %X %X %X";
-      }
-      when ('5400') {
-          say parsed "%u BEP:SetTime(RTC) YY T:%g %u %u A:%u AC:%f Adj:%g dCB:%f";
-      }
-
-
-      when ('5413') {
-          say parsed "CM:RtcGetPrecise: rtcCal:%g rtcDft:%g rtcTT:%g Dt:%g rtcCnt:%u rtcAcq:%u tUnc:%g towCal:%g tow:%g cd:%u";
-      }
-      
-      when ('5426') {
-          say parsed "%u CM:RtcEdgeAlign T:%u dRate:%u count:%u %u Acq:%u Wclk:%u dRtc:%g prevAcq:%u bepDrift:%g rtcDrift:%g";
-      }
-      
-      when ('5493') {
-          say parsed "%u CM:XO:Upd:tVal:%u wn:%u freq:%u freqEst:%u uTNEst:%u uMN:%u uMF:%u uTN:%u uTF:%u uAN:%u uAF:%u uN:%u uF:%u";
-      }
-      
-      when ('5494') {
-          say parsed "%u CM:XO:LastCal:%u freq:%u freqUnc:%u rD:%g rT:%g tr:%u uG:%u fHC:%u mD:%u";
-      }
-      
-      when ('5495') {
-          say parsed "%u CM:XoRampRateCheck:%u reset:%u rr:%u dTemp:%u dt:%u t:%u to:%u";
-      }
-
-      when ('69AB') {
-          say parsed "%u ATX: Meas Send:%u %u %u %u %u %u %u %u";
-      }
-
-      
-      #### FIXME: E109 uses much of the same infrastucture as E10A, so we keep it here, and hope for no same CMD/SUB pairs :) ####
-      when ('5800') {
-          if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
-          say parsed "(guess) SiRF GPS SW Version: %s";
-      }
-
-      when ('5802') {
-          if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
-          say parsed "(guess) Compiler: %s";
-      }
-      when ('5803') {
-          if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
-          say parsed "(guess) ASIC %s 0x%x";
-      }
-      when ('5805') {
-          if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
-          say parsed "(guess) Config: RefClk: %u Hz ClkOffset: %u Hz Unc: %u ppb Lna: %s Baud: %u Backup LDO: %s";
-      }
-      when ('5804') { 
-          if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
-  	  say parsed "CPU Speed: %s    Cache: %s"; 
-      }
-      when ('5E09') { 
-          if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
-	  say parsed "%s"; 
-      }
-      when ('5700') {
-          if ($LEAD_IN ne 'E109') { die "0x$CMD$SUB should only be in E109, not $LEAD_IN" }
-          say parsed "%s"; 
-      }
-      #### FIXME: end E109 command block ####
-      
-
-      default {
-        say "skip lead-in 0x$LEAD_IN unknown CMD 0x$CMD SUB 0x$SUB $rest" if $DEBUG > 0;
-        #next; # FIXME DELME
-        my $count=0;
-        while (@data) {
-            if ($data[0] =~ /^[ACE]0/) {	# this would die on get_var(). so  assume float (athough it might be double, too)
-              my $unk_float = get_float();
-              say "    unknown var$count (guess float?) = $unk_float";
-            } else {		# guess normal byte
-              my $unknown = get_var();
-              my $unk_dec = hex($unknown);
-              say "    unknown var$count = 0x$unknown ($unk_dec)"; 
+          default {
+            say "skip lead-in 0x$LEAD_IN unknown CMD 0x$CMD SUB 0x$SUB $rest" if $DEBUG > 0;
+            #next; # FIXME DELME
+            my $count=0;
+            while (@data) {
+                if ($data[0] =~ /^[ACE]0/) {	# this would die on get_var(). so  assume float (athough it might be double, too)
+                  my $unk_float = get_float();
+                  say "    unknown var$count (guess float?) = $unk_float";
+                } else {		# guess normal byte
+                  my $unknown = get_var();
+                  my $unk_dec = hex($unknown);
+                  say "    unknown var$count = 0x$unknown ($unk_dec)"; 
+                }
+                $count++;
             }
-            $count++;
+            # die "FIXME this cmdcode" if "$CMD$SUB" eq '1F01';
+            # die "FIXME please parse and add this command code $CMD $SUB";
+            next;
+          }
         }
-        # die "FIXME this cmdcode" if "$CMD$SUB" eq '1F01';
-        # die "FIXME please parse and add this command code $CMD $SUB";
-        next;
-      }
-    }
-    
-    # if we parsed packet ccrrectly, there should be NO data remaining...
-    if (@data) {
-      die "finished decoding packet, but data still remains: @data";
-    }    
+        
+        # if we parsed packet ccrrectly, there should be NO data remaining...
+        if (@data) {
+          die "finished decoding packet, but data still remains: @data";
+        }    
 
-    if ($real_len != $expected_len) {
-        die "FATAL: invalid length - found $real_len, expected $expected_len: $_";	
-    }
-    
-    } elsif ($LEAD_IN =~ /^81..$/) {	# FIXME indent properly
+        if ($real_len != $expected_len) {
+            die "FATAL: invalid length - found $real_len, expected $expected_len: $_";	
+        }
+        
+    } elsif ($LEAD_IN =~ /^81..$/) {
         say "$time$msec unknown empty-load LEAD-IN of 0x$LEAD_IN";
         if (@data) { die "finished decoding packet, but data still remains: @data" }
-    } elsif ($LEAD_IN =~ /^8F0[12]$/) {	# FIXME indent properly
+    } elsif ($LEAD_IN =~ /^8F0[12]$/) {
         say "$time$msec LEAD-IN of 0x$LEAD_IN equivalent to SiRFbinary MID 93 (0x5D) - TCXO Output! (FIXME - more parsing if we need it)";
     } else {
         print "$time$msec currently unsupported LEAD-IN $LEAD_IN: $_";
