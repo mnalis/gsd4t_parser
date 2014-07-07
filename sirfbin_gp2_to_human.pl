@@ -117,6 +117,7 @@ while (<>) {
       
       when ('02') {
           say "GPSD knows MID 0x$MID --  Measure Navigation Data Out MID 2 -- hex $rest";
+          printf "  GPS location fix found!\n";
           @data = ();	# FIXME DELME
       }
 
@@ -147,8 +148,8 @@ while (<>) {
 
       when ('09') {
           say "GPSD knows MID 0x$MID --  (unused debug) CPU Throughput MID 9 -- hex $rest";
-          printf "  SiRF: THR 0x09: SegStatMax=%.3f, SegStatLat=%3.f, AveTrkTime=%.3f, Last MS=%u\n",
-            getbeu16()/186, getbeu16()/186, getbeu16()/186, getbeu16();
+          printf "  SiRF: THR 0x09: SegStatMax=%.3f, SegStatLat=%3.f, AveTrkTime=%.3f, Last MS=%u (FIXME - check)\n",
+            getbeu16 / 186, getbeu16 / 186, getbeu16 / 186, getbeu16;
       }
 
       when ('0A') {
