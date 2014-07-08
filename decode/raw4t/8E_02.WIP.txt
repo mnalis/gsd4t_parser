@@ -1,0 +1,7 @@
+---- trying to decode LEADIN 0x8e02 ----
+
+16:21:38.209 currently unsupported LEAD-IN 8E02: 00/00/0006 16:21:38.209 (0) 8E 
+02 03 00 44 03 00 00 00 00 00 00 00 00 DD 00 09 00 37 00 	# seq1=009C seq2=0008 len=0014
+
+16:21:38.308 GPSD knows MID 0x5C --  (unused) CW Controller Output MID 92 -- hex 
+02 03 00 44 03 00 00 00 00 00 00 00 00 DD 00 09 00 37 00

@@ -1,0 +1,11 @@
+---- trying to decode LEADIN 0x82xx ----
+16:21:34.092 currently unsupported LEAD-IN 8230: 00/00/0006 16:21:34.092 (0) 82 
+# 30 17 04 01 00 F9 C5 68 00 01 77 FA 00 00 00 04 	# seq1=0000 seq2=FFFF len=0011	# WARNING: leading zero not 00 but 08 in 00/00/0005 16:21:34.092 (0) A0 A2 08 00 00 FF FF 00 11 E8 52 82 30 17 04 01 00 F9 C5 68 00 01 77 FA 00 00 00 04 46 C0 B0 B3
+
+
+16:21:34.374 GPSD knows MID 0x40 --  Nav Library MID 64 -- hex 01 00 00 00 98 07 06 00 03 6C F4 00 01 00 11 
+# 30 17 04 01 00 F9 C5 68 00 01 77 FA 00 00 00 04 -- match
+00 00 00 01
+
+
+
