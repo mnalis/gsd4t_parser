@@ -151,7 +151,10 @@ while (<>) {
           }
           printf "   xv=%f yv=%f zv=%f\n", getbes16 / 8, getbes16 / 8, getbes16 / 8;
           printf "   mode1=0x%x HDOP=%f mode2=0x%x\n", getub, getub / 5, getub;
-          printf "   GPS week=%d TOW=%f\n", getbes16, getbeu32 / 100;
+          my $week=getbes16; my $TOW = getbeu32 / 100;
+          printf "   GPS week=%d TOW=%f\n", $week, $TOW;
+          my $gpstime = 315964800 + ($week + 1*1024)*60*60*24*7 + $TOW;
+          printf "     (time=$gpstime ==> %s -- FIXME: kludge overflow, no leap seconds calc)\n", localtime($gpstime) . "";
           printf "   SVs in fix=%d, CH1-12 PRN: %d %d %d %d %d %d %d %d %d %d %d %d\n", getub, getub, getub, getub, getub, getub, getub, getub, getub, getub, getub, getub, getub;
       }
 
