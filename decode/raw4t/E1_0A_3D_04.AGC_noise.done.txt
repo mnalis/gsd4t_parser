@@ -1,0 +1,12 @@
+--- AGC Noise ---
+16:21:37.092 E1 0A 3D 04 0F 60 16 71 43 40 46 00 60 01 50 ED 1B 	#  seq1=0080 seq2=0007 len=0011
+16:21:37.095 DEV TEXT(44/E1): AGC: noise 1470787 17920 freq 86253 gain 27
+
+16:21:37.092 E1 0A 3D 04 0F -- opcode for "AGC: noise/freq/gain" ?
+60 -- next value 3bytes
+16 71 43  -- noise 1470787
+40 -- next value 2bytes
+46 00 -- 17920
+60 -- next value 3bytes
+01 50 ED -- freq 86253
+1B -- gain 27

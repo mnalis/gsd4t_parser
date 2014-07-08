@@ -1,0 +1,33 @@
+--- ChdevsB: invalid lenght2 ----
+16:21:35.265 DEV TEXT(44/E1):   900 ChdevsB: 14- 2  2- 2  2- 2 12- 2 12- 2 31- 2 31- 2 25- 2 25- 2  0-15  1-14
+16:21:35.230 (0) E1 0A 14 21 06 40 03 84 14 22 05 0E 02 14 22 05 02 02 14 22 05 02 02 14 22 05 0C 02 14 22 05 0C 02 14 22 05 1F 02 14 22 05 1F 02 14 22 05 19 02 14 22 05 19 02 14 22 05 00 0F 14 22 05 01 0E 	# seq1=0044 seq2=0004 len=003F
+
+WARNING: skipping due to invalid length - found 61, expected 6: 00/00/0006 
+16:21:35.230 (0) 
+E1 0A -- lead-in
+14 21 - CMD/SUB
+06 - (number of bytes after E1 0A, that is CMD/SUB/LEN/LABEL
+40 03 84 - 900
+14 22 05 -- subpacket command 0x1422 and length (subpacket cmd/subpacket sub/subpacket len + 2byte payload)
+# no number of subpackets. hardcoded to 11 or read-as-many-as-there-are?
+0E 02 - 14-2
+14 22 05 
+02 02 - 2-2
+14 22 05
+02 02 - 2-2
+14 22 05 
+0C 02 - 12-2
+14 22 05 
+0C 02 - 12-2
+14 22 05 
+1F 02 - 31-2
+14 22 05 
+1F 02 - 31-2
+14 22 05 
+19 02 - 25-2
+14 22 05 
+19 02 - 25-2
+14 22 05
+00 0F - 0-15
+14 22 05 
+01 0E - 1-14 	# seq1=0044 seq2=0004 len=003F

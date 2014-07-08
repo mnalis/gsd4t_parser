@@ -1,0 +1,82 @@
+--- ACQ: S5 ---
+16:21:36.498 E1 0A 2D 0B 2E 40 08 98 20 53 05 02 20 26 13 60 01 80 81 00 42 FF CE AB 00 00 00 00 20 82 00 20 F0 04 03 11 00 00 00 40 06 1F 60 2F F3 26 20 39 	#  seq1=0071 seq2=0007 len=0030
+16:21:36.499 DEV TEXT(44/E1):  2200 ACQ: S5 sv 2 ch38 CN0:19 D:98433  0 C:127.90 0.00 Th:130 0 Pk:240 4 3 0011 ms:0 vo:0 bs:0 1567 3142438 57
+
+16:21:36.498 E1 0A 2D 0B 2E -- opcode for "ACQ: Sx"
+40 -- next value 2bytes
+08 98 -- 2200
+20 -- next value 1byte
+53 -- "S"
+05 -- 5
+02 -- sv 2
+20 -- next value 1byte
+26 -- ch38
+13 -- CN0:19
+60 -- next value 3bytes
+01 80 81 -- D:98433
+00 -- 0
+42 FF CE AB     -- FIXME C:127.90 (see floating point 4-byte formulas?)
+00 00 00 00 -- 0.00 ?
+20 -- next value 1byte
+82 -- Th:130
+00 -- 0
+20 -- next value 1byte
+F0 -- Pk:240 
+04 -- 4
+03 -- 3
+11 -- 0011 (?)
+00 -- ms:0
+00 -- vo:0
+00 -- bs:0
+40 -- next value 2bytes
+06 1F -- 156760 
+2F F3 26 - 3142438 
+20 -- next value 1byte
+39 --  57
+
+16:21:37.099 E1 0A 2D 0B 2F 40 0A F0 20 53 05 19 20 29 11 60 01 7A C8 00 42 FF A5 BA 00 00 00 00 20 B1 00 40 01 05 04 03 00 00 00 00 40 09 93 60 4A 47 E3 20 58 	#  seq1=0081 seq2=0007 len=0031
+16:21:37.102 DEV TEXT(44/E1):  2800 ACQ: S5 sv25 ch41 CN0:17 D:96968  0 C:127.82 0.00 Th:177 0 Pk:261 4 3 0000 ms:0 vo:0 bs:0 2451 4868067 88
+16:21:37.099 E1 0A 2D 0B 2F 
+ 40 -- next value 2bytes
+ 0A F0 -- 2800
+ 20 -- next value 1byte
+ 53 -- "S"
+ 05 -- 5
+ 19 -- sv25
+ 20 -- next value 1byte
+ 29 -- ch41
+ 11 -- CN0:17
+ 60 -- next value 3bytes
+ 01 7A C8 -- D:96968
+ 00 -- 0
+ 42 FF A5 BA -- C:127.82 (floats as IEEE 754, but have to fix endiannes)
+ 00 00 00 00 -- 0.00
+ 20 -- next value 1byte
+ B1 -- Th:177
+ 00 -- 0
+ 40 -- next value 2bytes
+ 01 05 -- Pk:261 (notice -- two bytes! and 40 byte before as opposed to 20 in 1-byte packet before) 
+ 04 -- 4
+ 03 -- 3
+ 00 -- 0000 ?
+ 00 -- ms:0
+ 00 -- vo:0
+ 00 -- bs:0
+ 40 -- next value 2bytes
+ 09 93 -- 2451
+ 60 -- next value 3bytes
+ 4A 47 E3 -- 4868067
+ 20 -- next value 1byte
+ 58 -- 88
+
+
+it seems to 0x20/40/60 before same value indicate length (1/2/3 bytes)
+
+general case seems to be:
+E1 0A -- lead-in (although there seems to be others, like 84, 8E etc... find them out later)
+2D -- command/MID ("ACQ:")
+03 -- subommand/SID ("New")
+12 -- lenght of packet (ignoring E1 0A lead-in)
+
+
+
