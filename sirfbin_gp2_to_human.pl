@@ -140,14 +140,14 @@ while (<>) {
       
       when ('02') {
           say "GPSD knows MID 0x$MID --  Measure Navigation Data Out MID 2 -- hex $rest";
-          printf "  GPS location fix found! FIXME PARSE\n";
+          printf "  GPS location fix found!\n";
           my ($x, $y, $z) = (getbes32, getbes32, getbes32);
           printf "   x=%d y=%d z=%d\n", $x, $y, $z;
           {
             use Geo::ECEF;
             my $obj=Geo::ECEF->new(); #WGS84 is the default
             my ($lat, $lon, $hae)=$obj->geodetic($x, $y, $z);
-            printf "     (lat=$lat, lon=$lon, HAE=$hae)\n";
+            printf "     (lat=$lat, lon=$lon, HAE=$hae -- FIXME ECEF calc?)\n";
           }
           printf "   xv=%f yv=%f zv=%f\n", getbes16 / 8, getbes16 / 8, getbes16 / 8;
           printf "   mode1=0x%x HDOP=%f mode2=0x%x\n", getub, getub / 5, getub;
