@@ -39,7 +39,7 @@ sub get_byte($) {
 #define getbes64(buf, off)      ((int64_t)(((uint64_t)getbeu32(buf, (off)) << 32) | getbeu32(buf, (off)+4)))
 #define getbeu64(buf, off)      ((uint64_t)(((uint64_t)getbeu32(buf, (off)) << 32) | getbeu32(buf, (off)+4)))
 
-# FIXME: returns big-endian unsigned integer 16-bits
+# returns big-endian unsigned integer 16-bits
 sub getbeu16() {
     return hex get_byte(2);
 }
@@ -48,7 +48,7 @@ sub getbes16() {
     return unpack('s', pack('S', getbeu16));
 }
 
-# FIXME: returns big-endian unsigned integer 32-bits
+# returns big-endian unsigned integer 32-bits
 sub getbeu32() {
     return hex get_byte(4);
 }
@@ -147,14 +147,14 @@ while (<>) {
             use Geo::ECEF;
             my $obj=Geo::ECEF->new(); #WGS84 is the default
             my ($lat, $lon, $hae)=$obj->geodetic($x, $y, $z);
-            printf "     (lat=$lat, lon=$lon, HAE=$hae -- FIXME ECEF calc?)\n";
+            printf "     (lat=$lat, lon=$lon, HAE=$hae -- FIXME ECEF calc precision?)\n";
           }
           printf "   xv=%f yv=%f zv=%f\n", getbes16 / 8, getbes16 / 8, getbes16 / 8;
           printf "   mode1=0x%x HDOP=%f mode2=0x%x\n", getub, getub / 5, getub;
           my $week=getbes16; my $TOW = getbeu32 / 100;
           printf "   GPS week=%d TOW=%f\n", $week, $TOW;
           my $gpstime = 315964800 + ($week + 1*1024)*60*60*24*7 + $TOW;
-          printf "     (time=$gpstime ==> %s -- FIXME: kludge overflow, no leap seconds calc)\n", localtime($gpstime) . "";
+          printf "     (time=$gpstime ==> %s -- FIXME: kludge 1 overflow, no leap seconds calc)\n", localtime($gpstime) . "";
           printf "   SVs in fix=%d, CH1-12 PRN: %d %d %d %d %d %d %d %d %d %d %d %d\n", getub, getub, getub, getub, getub, getub, getub, getub, getub, getub, getub, getub, getub;
       }
 
@@ -185,7 +185,7 @@ while (<>) {
 
       when ('09') {
           say "GPSD knows MID 0x$MID --  (unused debug) CPU Throughput MID 9 -- hex $rest";
-          printf "  SiRF: THR 0x09: SegStatMax=%.3f, SegStatLat=%3.f, AveTrkTime=%.3f, Last MS=%u (FIXME - check)\n",
+          printf "  SiRF: THR 0x09: SegStatMax=%.3f, SegStatLat=%3.f, AveTrkTime=%.3f, Last MS=%u\n",
             getbeu16 / 186, getbeu16 / 186, getbeu16 / 186, getbeu16;
       }
 
