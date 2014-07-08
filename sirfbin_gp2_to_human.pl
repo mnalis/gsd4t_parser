@@ -29,11 +29,38 @@ sub get_byte($) {
     return $ret;
 }
 
-# returns big-endian unsigned integer 16-bits
+
+#from gpsd(1) source
+#/* big-endian access */
+#define getbes16(buf, off)      ((int16_t)(((uint16_t)getub(buf, (off)) << 8) | (uint16_t)getub(buf, (off)+1)))
+#define getbeu16(buf, off)      ((uint16_t)(((uint16_t)getub(buf, (off)) << 8) | (uint16_t)getub(buf, (off)+1)))
+#define getbes32(buf, off)      ((int32_t)(((uint16_t)getbeu16(buf, (off)) << 16) | getbeu16(buf, (off)+2)))
+#define getbeu32(buf, off)      ((uint32_t)(((uint16_t)getbeu16(buf, (off)) << 16) | getbeu16(buf, (off)+2)))
+#define getbes64(buf, off)      ((int64_t)(((uint64_t)getbeu32(buf, (off)) << 32) | getbeu32(buf, (off)+4)))
+#define getbeu64(buf, off)      ((uint64_t)(((uint64_t)getbeu32(buf, (off)) << 32) | getbeu32(buf, (off)+4)))
+
+# FIXME: returns big-endian unsigned integer 16-bits
 sub getbeu16() {
     return hex get_byte(2);
 }
+# returns big-endian unsigned integer 16-bits
+sub getbes16() {
+    return unpack('s', pack('S', getbeu16));
+}
 
+# FIXME: returns big-endian unsigned integer 32-bits
+sub getbeu32() {
+    return hex get_byte(4);
+}
+# returns big-endian signed integer 32-bits
+sub getbes32() {
+    return unpack('l', pack('L', getbeu32));
+}
+
+# returns unsigned integer 8-its
+sub getub() {
+    return hex get_byte(1);
+}
 ######### MAIN ##########
 
 # format is like:
@@ -113,7 +140,22 @@ while (<>) {
       
       when ('02') {
           say "GPSD knows MID 0x$MID --  Measure Navigation Data Out MID 2 -- hex $rest";
-          @data = ();	# FIXME DELME
+          printf "  GPS location fix found!\n";
+          my ($x, $y, $z) = (getbes32, getbes32, getbes32);
+          printf "   x=%d y=%d z=%d\n", $x, $y, $z;
+          {
+            use Geo::ECEF;
+            my $obj=Geo::ECEF->new(); #WGS84 is the default
+            my ($lat, $lon, $hae)=$obj->geodetic($x, $y, $z);
+            printf "     (lat=$lat, lon=$lon, HAE=$hae -- FIXME ECEF calc?)\n";
+          }
+          printf "   xv=%f yv=%f zv=%f\n", getbes16 / 8, getbes16 / 8, getbes16 / 8;
+          printf "   mode1=0x%x HDOP=%f mode2=0x%x\n", getub, getub / 5, getub;
+          my $week=getbes16; my $TOW = getbeu32 / 100;
+          printf "   GPS week=%d TOW=%f\n", $week, $TOW;
+          my $gpstime = 315964800 + ($week + 1*1024)*60*60*24*7 + $TOW;
+          printf "     (time=$gpstime ==> %s -- FIXME: kludge overflow, no leap seconds calc)\n", localtime($gpstime) . "";
+          printf "   SVs in fix=%d, CH1-12 PRN: %d %d %d %d %d %d %d %d %d %d %d %d\n", getub, getub, getub, getub, getub, getub, getub, getub, getub, getub, getub, getub, getub;
       }
 
       when ('04') {
@@ -143,8 +185,8 @@ while (<>) {
 
       when ('09') {
           say "GPSD knows MID 0x$MID --  (unused debug) CPU Throughput MID 9 -- hex $rest";
-          printf "  SiRF: THR 0x09: SegStatMax=%.3f, SegStatLat=%3.f, AveTrkTime=%.3f, Last MS=%u\n",
-            getbeu16()/186, getbeu16()/186, getbeu16()/186, getbeu16();
+          printf "  SiRF: THR 0x09: SegStatMax=%.3f, SegStatLat=%3.f, AveTrkTime=%.3f, Last MS=%u (FIXME - check)\n",
+            getbeu16 / 186, getbeu16 / 186, getbeu16 / 186, getbeu16;
       }
 
       when ('0A') {
