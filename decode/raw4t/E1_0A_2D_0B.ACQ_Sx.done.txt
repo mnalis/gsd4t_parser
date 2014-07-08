@@ -2,7 +2,8 @@
 16:21:36.498 E1 0A 2D 0B 2E 40 08 98 20 53 05 02 20 26 13 60 01 80 81 00 42 FF CE AB 00 00 00 00 20 82 00 20 F0 04 03 11 00 00 00 40 06 1F 60 2F F3 26 20 39 	#  seq1=0071 seq2=0007 len=0030
 16:21:36.499 DEV TEXT(44/E1):  2200 ACQ: S5 sv 2 ch38 CN0:19 D:98433  0 C:127.90 0.00 Th:130 0 Pk:240 4 3 0011 ms:0 vo:0 bs:0 1567 3142438 57
 
-16:21:36.498 E1 0A 2D 0B 2E -- opcode for "ACQ: Sx"
+16:21:36.498 E1 0A 2D 0B -- opcode for "ACQ: Sx"
+2E -- len (sub+cmd+len+label)
 40 -- next value 2bytes
 08 98 -- 2200
 20 -- next value 1byte
@@ -36,7 +37,8 @@ F0 -- Pk:240
 
 16:21:37.099 E1 0A 2D 0B 2F 40 0A F0 20 53 05 19 20 29 11 60 01 7A C8 00 42 FF A5 BA 00 00 00 00 20 B1 00 40 01 05 04 03 00 00 00 00 40 09 93 60 4A 47 E3 20 58 	#  seq1=0081 seq2=0007 len=0031
 16:21:37.102 DEV TEXT(44/E1):  2800 ACQ: S5 sv25 ch41 CN0:17 D:96968  0 C:127.82 0.00 Th:177 0 Pk:261 4 3 0000 ms:0 vo:0 bs:0 2451 4868067 88
-16:21:37.099 E1 0A 2D 0B 2F 
+16:21:37.099 E1 0A 2D 0B 
+ 2F -- len (sub+cmd+len+label)
  40 -- next value 2bytes
  0A F0 -- 2800
  20 -- next value 1byte
