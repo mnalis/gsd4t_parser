@@ -269,6 +269,11 @@ while (<>) {
           @data = ();	# FIXME DELME
       }
 
+      when ('33') {
+          say "Tracker Load Status Report (UNUSED) -- hex $rest";
+          @data = ();	# FIXME DELME
+      }
+
       when ('34') {
           say "GPSD knows MID 0x$MID --  PPS Time MID 52 -- hex $rest";
           @data = ();	# FIXME DELME
