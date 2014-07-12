@@ -54,13 +54,6 @@ sub get_var() {
     return $size;	# if no special prefix for size, then it is our one-byte value!
 }
 
-# fills vars passed as reference with hex values of get_var()
-sub get_hexvars {
-    foreach my $ref (@_) {
-        $ref = hex get_var();
-    }
-}
-
 # like hex(), but autodetect signed values
 sub signhex($) {
     my ($h) = @_;
