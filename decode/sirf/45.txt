@@ -1,0 +1,46 @@
+SLCLog.gp2:
+# position response?
+16:21:46.509 skip unknown MID 0x45 -- hex 01 00 01 00 01 01 00 07 06 0D 61 F3 32 3E 2F BE 91 0B 3C 37 20 1F D3 86 86 15 A9 81 00 03 B2 A6 00 BE 34 1A 16 00 33 37 6B E8 00 0F 05 1D 25 31 15 18 00 02 13 42 19 11 45 0E 10 4C 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+# measeurements response?
+16:21:46.511 skip unknown MID 0x45 -- hex 02 00 01 04 00 00 00 00 00 00 00 00
+
+
+DetailedLog.txt:
+<2014:06:24:16:21:46> GPS -> SET :OSP_POSITION_RESPONSE 00 01 00 01 01 00 06 07 32 f3 61 0d 91 be 2f 3e 20 37 3c 0b 1f d3 86 86 a9 15 81 00 03 00 a6 b2 00 be 34 1a 16 00 37 33 e8 6b 00 0f 05 1d 25 31 15 18 00 02 13 42 19 11 45 0e 10 4c 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+<2014:06:24:16:21:46> GPS -> SET :OSP_MEASURE_RESPONSE 00 01 04 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+sirf_interface_log.txt:
+<16:21:46> ##### TTFF : 26 second #####
+<16:21:46> INFO: (lsmLocCallback) rcvedNumOfFixes/numFixes = 148/0
+<16:21:46> INFO: lsmLocCallback : do nothing
+<16:21:46> LSM_Position_CallBack: called
+<16:21:46> Acc from LPL is :124
+<16:21:46> Local Time Updated : ref UTC = 1403619708000 ,  unc = 2500, ref sys time= 6201419
+<16:21:46> Position Fix (148 of 0) : Latitude 43.724884   Longtitude 15.799523
+<16:21:46> LSM:lsmLocCB out
+
+BriefLog.txt:
+<2014:06:24:16:21:46> OSP POSITION
+<2014:06:24:16:21:46> GPS -> SET :OSP POSITION RESPONSE
+<2014:06:24:16:21:46> The Horizontal Uncertainity of position = 124
+<2014:06:24:16:21:46> After adjustment, Horizontal Uncertainity of position = 124
+<2014:06:24:16:21:46> Before modification hor_error_major=0x86, hor_err_minor=0x86
+<2014:06:24:16:21:46> After modification hor_err_major=0x86, hor_err_minor=0x86
+<2014:06:24:16:21:46> After possible adjustment hor_err_major=0x86, hor_err_minor=0x86
+<2014:06:24:16:21:46> Velocity in AI3: Heading 45734, horizontalVelocity 3, verticalVelocity 0
+<2014:06:24:16:21:46> Velocity after conversion: Heading 251, horizontalVelocity 0.675000, verticalVelocity 0.000000
+<2014:06:24:16:21:46> SV=00 PRN=29 C/N0=37 Azimuth=289 Angle=078
+<2014:06:24:16:21:46> SV=01 PRN=21 C/N0=24 Azimuth=190 Angle=021
+<2014:06:24:16:21:46> SV=02 PRN=02 C/N0=19 Azimuth=046 Angle=024
+<2014:06:24:16:21:46> SV=03 PRN=25 C/N0=17 Azimuth=087 Angle=069
+<2014:06:24:16:21:46> SV=04 PRN=14 C/N0=16 Azimuth=229 Angle=005
+<2014:06:24:16:21:46> TTFF1=0 TTFF2=26 TTFF3=0 TTFF=26
+<2014:06:24:16:21:46>  *** POSITION #148 Lat=43.724884 Lon=15.799523 Alt=54.500000 TTFF=26 GPSsec=224523058
+<2014:06:24:16:21:46> POSITION GOT in OSP Response =  Lat: 1043316369 Lon: 188495648 Alt:5545
+	Lat: 1043316369	0x(3E 2F BE 91) -- found in DetailedLog.txt OSP_POSITION_RESPONSE as 0x(91 be 2f 3e)
+	Lon: 188495648	0x(0B 3C 37 20) -- found in DetailedLog.txt OSP_POSITION_RESPONSE as 0x(20 37 3c 0b)
+	Alt: 5545	0x(15 A9)	-- found in DetailedLog.txt OSP_POSITION_RESPONSE as 0x(a9 15)
+<2014:06:24:16:21:46> INFO: Output the default location method, Location method not intiialized
+<2014:06:24:16:21:46> INFO in OSP resp: hor_err_major = 0x86
+<2014:06:24:16:21:46> INFO in OSP resp: hor_err_minor = 0x86
+<2014:06:24:16:21:46> INFO in OSP resp: velocity_ver_err = 0x16

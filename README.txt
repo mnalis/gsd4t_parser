@@ -155,7 +155,11 @@ A0A2 00  03F4 00A3 0014 CB5A 8E 02 03 01 43 03 71 00 00 00 00 00 00 00 00 00 00 
 
 ---- UTILS AVAILABLE ----
 - sirfbin_gp2_to_human.pl -- parses SLCLog.gp2 to verify basic checksums and conformance. 
-  for more parsing, use gp2_to_bin.pl, gpsd(8) and cgps(1) instead.
+  for more parsing:
+  a) use gp2_to_bin.pl, gpsd(8) and cgps(1)
+  b) use gp2_to_bin.pl, gpsdecode -v < SLCLog.gp2.bin (from gpsd-clients)
+  c) use gp2_to_bin.pl, gpsmon SLCLog.gp2.bin (from gpsd-clients)
+  d) use gp2_to_bin.pl, sirfdump -v SLCLog.gp2.bin ( from https://github.com/mnalis/gps-kit-cvs )
 
   to get SLCLog.gp2 and other debug files, do:
   adb shell	# connect to your android
@@ -172,8 +176,7 @@ A0A2 00  03F4 00A3 0014 CB5A 8E 02 03 01 43 03 71 00 00 00 00 00 00 00 00 00 00 
   useful for creating binary files to give to gpsd(8) and cgps(1) to replay session
 
 - sirfbin_to_gp2.pl - parses raw SiRF binary commands (like SLCLog.bin) and
-  creates SLCLog.gp2 text file. Note: depends od A0A2 / B0B3, so only SiRF
-  OSP and enc4t can be converted.
+  creates SLCLog.gp2 text file. Note: depends od A0A2 / B0B3, so only SiRF OSP and enc4t can be converted.
 
 - strace_to_gp2.pl - converts strace logs to human readable format
   parses raw binary communication in strace.log.* files (from /dev/ttySAC1 GPS GSD4t chipset) 
