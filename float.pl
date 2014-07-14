@@ -1,3 +1,7 @@
+#!/usr/bin/perl -w
+
+use strict;
+use autodie;
 use feature 'say';
 
 my $num = 43.724884;
