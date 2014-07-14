@@ -132,7 +132,8 @@ while (<>) {
           $str =~ s/\n/%/g;
           print "DEV TEXT(44/E1): $str\n";
         } else {
-          print "MID 0x$MID -skip unknown SID 0x$SID - $rest\n" if $DEBUG > 0;
+          $rest = join ' ', @data;
+          say "MID 0x$MID - skip unknown SID 0x$SID - $rest";
         }
         @data = ();
       }
@@ -286,6 +287,20 @@ while (<>) {
 
       when ('40') {
           say "GPSD knows MID 0x$MID --  Nav Library MID 64 -- hex $rest";
+          @data = ();	# FIXME DELME
+      }
+
+      when ('45') {
+          my $SID = shift @data;
+          $rest = join ' ', @data;
+          
+          if ($SID eq '01') {
+              say "guess MID 0x$MID SID 0x$SID -- related to DetailedLog.txt OSP_POSITION_RESPONSE ? -- hex $rest";
+          } elsif ($SID eq '02') {
+              say "guess MID 0x$MID SID 0x$SID -- related to DetailedLog.txt OSP_MEASURE_RESPONSE ? -- hex $rest";
+          } else {
+              say "MID 0x$MID - skip unknown SID 0x$SID - $rest";
+          }
           @data = ();	# FIXME DELME
       }
 
