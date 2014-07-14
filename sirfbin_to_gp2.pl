@@ -26,9 +26,9 @@ while (read (STDIN, my $c, 1)) {
   $DEBUG && print "char=0x$x out=$out\n" ;
   
   if ($x eq 'B3' and $last_x eq 'B0') {		# packet ended, print it
+      if ($count1++ > 999) { $count2++; $count1=0; }
       printf "00/00/0007 00:00:%02d.%03d (0) $out\n", $count2, $count1;
       $out = '';
   }
-  if ($count1++ > 999) { $count2++; $count1=0; }
   $last_x = $x;
 }
