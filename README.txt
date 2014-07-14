@@ -171,6 +171,10 @@ A0A2 00  03F4 00A3 0014 CB5A 8E 02 03 01 43 03 71 00 00 00 00 00 00 00 00 00 00 
 - gp2_to_bin.pl - parses SLCLog.gp2 and creates raw binary commands (like SLCLog.bin)
   useful for creating binary files to give to gpsd(8) and cgps(1) to replay session
 
+- sirfbin_to_gp2.pl - parses raw SiRF binary commands (like SLCLog.bin) and
+  creates SLCLog.gp2 text file. Note: depends od A0A2 / B0B3, so only SiRF
+  OSP and enc4t can be converted.
+
 - strace_to_gp2.pl - converts strace logs to human readable format
   parses raw binary communication in strace.log.* files (from /dev/ttySAC1 GPS GSD4t chipset) 
   and creates human readable log suitible for comparing with SLCLog.gp2 and guessing translations.
