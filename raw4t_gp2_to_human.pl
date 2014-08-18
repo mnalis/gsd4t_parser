@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 # by Matija Nalis <mnalis-android@voyager.hr> GPLv3+, started 2014-06-24
+# extended by Hrvoje Cavrak <hrvoje8@gmail.com> 2014/07
 # parse decapsulated GSD4t .gp2 container format data and interprets it for human use
 #
 # Usage: ./strace_to_gp2.pl data/strace4/strace.log.3491 | ./enc4t_gp2_to_raw4t_gp2.pl | ./raw4t_gp2_to_human.pl
