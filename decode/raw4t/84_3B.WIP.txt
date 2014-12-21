@@ -13,7 +13,8 @@
 + D6 B4 D9 15 ED BF 22 77 0B F9 E9 D9 00 03 00 0A 00 AB 4A EA 00 00 00 6F 00 01 BC -- match
 + 00 00 00 00 00 00 00   -- double zeroes
 + 39 00 FF 03 01 CA 00 D0 -- match
-? 00 00 00 00 00 14 3C 03 0A 
+? 00 00 00 00 00 14 3C 03 
++ 0A - number of following entries?
   01 72 
   01 72
   01 72
@@ -33,7 +34,8 @@
 + D6 CC B7 45 AF 3E 38 22 0C 51 0B 7D 00 02 00 00 00 AB 4A EA FF FF FF 75 FF FD D4 -- match
 + 00 00 00 00 00 00 00  -- double zeroes
 + 39 00 FF D4 FE FD 00 1B -- match
-? 00 00 00 03 32 09 B0 06 0A 
+? 00 00 00 03 32 09 B0 06
++ 0A - number of following entries?
   00 BF
   00 BF
   00 C0
@@ -53,7 +55,8 @@
 + D6 D2 08 CA A4 60 D4 6D 0C 61 6A F9 00 0B 00 0F 00 AB 4A E9 FF FF FF CF FF FF 3C -- match
 + 00 00 00 00 00 00 00   -- double zeroes
 + 39 00 FC 0C 0C 1E 00 11 -- match
-? 00 00 00 01 32 08 E8 04 0A 
+? 00 00 00 01 32 08 E8 04
++ 0A - number of following entries?
   00 A2
   00 A2
   00 A3
@@ -74,7 +77,8 @@
 + D6 BC D8 D0 A7 CC 41 B4 0B 9D 2D F2 FF FF 00 12 00 AB 4A E9 00 00 00 35 00 00 D4 -- match
 + 00 00 00 00 00 00 00    -- double zeroes
 + 39 00 00 46 03 E3 FF E8 -- match
-? 00 00 00 04 32 0F 78 01 0A 
+? 00 00 00 04 32 0F 78 01
++ 0A - number of following entries?
   00 F5
   00 F4
   00 F5
