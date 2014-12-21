@@ -1,0 +1,17 @@
+16:21:40.160 GPSD knows MID 0x1E --  (unused) Navigation Library SV State Data MID 30 -- hex 1D 10 3B 52 9C 41 0B 68 26 19 6A 1E 2E 41 71 9C B4 93 C2 ED B6 41 32 3F 3D F8 CA 65 80 41 72 2F 37 98 5F 60 FE C0 9B 11 7F 11 7E F8 25 40 9A 51 B0 00 9A 29 46 40 98 AE C2 A9 FD A9 CC 3F 41 C2 9F 2C 4A 1C 24 01 00 00 00 00 00 00 00 00 40 7D E8 05
+
+
+1D	- sattelite ID
+10 3B 52 9C 41 0B 68 26 - GPS Time (double)
+19 6A 1E 2E 41 71 9C B4 - X pos. 
+93 C2 ED B6 41 32 3F 3D - Y pos.
+F8 CA 65 80 41 72 2F 37 - Z pos.
+98 5F 60 FE C0 9B 11 7F - X velocity
+11 7E F8 25 40 9A 51 B0 - Y velocity
+00 9A 29 46 40 98 AE C2 - Z velocity
+A9 FD A9 CC 3F 41 C2 9F - clock bias
+2C 4A 1C 24		- clock drift
+01			- ephemeris flag
+00 00 00 00		(reserved)
+00 00 00 00		(reserved)
+40 7D E8 05		- Ionospheric Delay
