@@ -3,7 +3,7 @@
 #01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 -- same
 #00 00 00 0A 89 DD 83 81 46 78 F1 C6 A7 7D 3A 02 8A C0 06 10 -- same 	# seq1=0097 seq2=0008 len=0033
 
-16:21:38.147 GPSD knows MID 0x08 --  subframe data MID 8 (extract leap-second from this) -- hex 
+16:21:38.147 GPSD knows MID 0x08 --  subframe data MID 8 (extract leap-second from this): 50 BPS data -- hex 
 00 1D 
 # 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 -- same 
 # 00 00 00 0A 89 DD 83 81 46 78 F1 C6 A7 7D 3A 02 8A C0 06 10 -- same
