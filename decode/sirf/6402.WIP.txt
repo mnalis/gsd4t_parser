@@ -31,7 +31,7 @@ D6 B4 D9 15 ED BF 22 77 0B F9 E9 D9 00 03 00 0A 00 AB 4A EA 00 00 00 6F 00 01 BC
 +	00 34		- Sum Abs Q
 +	00 AB 4A 64	- SV Bit Number
 +	00 04		- Mpath LOS Det Value
-	00 00		- Mpath Only Det Value
++	00 00		- Mpath Only Det Value
 	00		- Recovery Status
 	00 00 00 04	- SW Time Uncertainty
 	
