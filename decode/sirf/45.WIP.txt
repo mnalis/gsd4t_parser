@@ -7,6 +7,28 @@ SLCLog.gp2:
 
 DetailedLog.txt:
 <2014:06:24:16:21:46> GPS -> SET :OSP_POSITION_RESPONSE 00 01 00 01 01 00 06 07 32 f3 61 0d 91 be 2f 3e 20 37 3c 0b 1f d3 86 86 a9 15 81 00 03 00 a6 b2 00 be 34 1a 16 00 37 33 e8 6b 00 0f 05 1d 25 31 15 18 00 02 13 42 19 11 45 0e 10 4c 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	00 01 00 01 01 00 06 07 32 f3 61 0d	?
+	91 be 2f 3e 				- Lat!
+	20 37 3c 0b				- Lon!
+	1f d3 					?
+	86 86 					- hor_error_major, hor_error_minor ?
+	a9 15 					- Alt!
+	81 00 03 00 				? (maybe part of that is: horizontalVelocity 3, verticalVelocity 0?)
+	a6 b2 					- Heading 45734
+	00 be 34 1a 16 00 37 33 e8 6b 00 0f 	?
+	05 					- number of visible SVs?
+	1d 25 					- PRN=29 C/N0=37
+	31 					?
+	15 18 					- PRN=21 C/N0=24
+	00 					?
+	02 13 					- PRN=02 C/N0=19
+	42 					?
+	19 11 					- PRN=25 C/N0=17
+	45 					?
+	0e 10					- PRN=14 C/N0=16
+	4c 					?
+	00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 		?
+
 <2014:06:24:16:21:46> GPS -> SET :OSP_MEASURE_RESPONSE 00 01 04 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 
 sirf_interface_log.txt:
@@ -40,7 +62,7 @@ BriefLog.txt:
 	Lat: 1043316369	0x(3E 2F BE 91) -- found in DetailedLog.txt OSP_POSITION_RESPONSE as 0x(91 be 2f 3e)
 	Lon: 188495648	0x(0B 3C 37 20) -- found in DetailedLog.txt OSP_POSITION_RESPONSE as 0x(20 37 3c 0b)
 	Alt: 5545	0x(15 A9)	-- found in DetailedLog.txt OSP_POSITION_RESPONSE as 0x(a9 15)
-<2014:06:24:16:21:46> INFO: Output the default location method, Location method not intiialized
+<2014:06:24:16:21:46> INFO: Output the default location method, Location method not initialized
 <2014:06:24:16:21:46> INFO in OSP resp: hor_err_major = 0x86
 <2014:06:24:16:21:46> INFO in OSP resp: hor_err_minor = 0x86
 <2014:06:24:16:21:46> INFO in OSP resp: velocity_ver_err = 0x16
