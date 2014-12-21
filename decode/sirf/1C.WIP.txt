@@ -1,0 +1,18 @@
+16:21:35.123 GPSD knows MID 0x1C --  (unused debug) (len should be 0x38) Navigation Library Measurement Data MID 28 -- hex 
+
+00 		- channel
+00 CC 8E C6	- time tag
+1D		- sattelite ID
+0E CE 8B 16 41 0B 67 FE	- GPS Software Time (double)
+D8 7A 3D 87 41 73 39 2B - pseudorange (double)
+46 8E 4E 12		- Carrier Frequency
+27 A2 86 25 41 73 39 2C - Carrier Phase
+00 B4		- Time in Track
+AD		- Sync Flags
+00 00 00 00 00 00 00 24 24 25 - C/N0 1 ... C/N0 10
+00 00		- Delta Range Interval
+00 00		- Mean Delta Range Time
+00 00		- Extrapolation Time
+32		- Phase Error Count
+00		- Low Power Count
+
