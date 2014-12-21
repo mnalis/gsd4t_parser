@@ -7,7 +7,7 @@ D6 B4 D9 15 ED BF 22 77 0B F9 E9 D9 00 03 00 0A 00 AB 4A EA 00 00 00 6F 00 01 BC
 
 
 # note: lines beggining with "+" we have in raw GSD4t data!
-                                                                  Ap
+
 02 -- Navigation Library (NL) Auxiliary Measurement Data - Message ID 64, Sub ID 2
 +	1D 		- SVID 29
 	10		- General Tracker Status (0x10 = Multipath detected)
@@ -27,10 +27,10 @@ D6 B4 D9 15 ED BF 22 77 0B F9 E9 D9 00 03 00 0A 00 AB 4A EA 00 00 00 6F 00 01 BC
 +	01 CA		- Delta Range Quality
 + 	00 D0		- Phase Lock Quality 
 	00 00		- Milliseconds uncertainty (not implemented)
-	02 54		- Sum Abs I
-	00 34		- Sum Abs Q
-	00 AB 4A 64	- SV Bit Number
-	00 04		- Mpath LOS Det Value
++	02 54		- Sum Abs I
++	00 34		- Sum Abs Q
++	00 AB 4A 64	- SV Bit Number
++	00 04		- Mpath LOS Det Value
 	00 00		- Mpath Only Det Value
 	00		- Recovery Status
 	00 00 00 04	- SW Time Uncertainty
