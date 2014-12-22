@@ -354,12 +354,13 @@ while (<>) {
         print "$time$msec ";
 
         given ("$LEAD_IN") {
-          when ('843B') {
-              say 'FIXME XXX';
+          when (['843B', '8445']) {
+              say "FIXME LEAD-IN $LEAD_IN --  XXX";
               say "\t" . parsed_raw 'unknown %X, maybe_counter %X%X%X%X';
-              say "\t" . parsed_raw 'unknown header stuff: ' . '%X ' x 45;
-              my $count=4;	# FIXME read somewhere from headers above?
-              while ($count--) {
+              say "\t" . parsed_raw 'unknown header stuff: ' . '%X ' x 43;
+              my $num_sv = hex get_byte(1);
+              say "\t" . parsed_raw "number of entries $num_sv (zero %X)";
+              while ($num_sv--) {
                   say parsed_raw "    SVID: %X (unk: %X%X%X) timeTag:%X%X%X%X codePhase: %X%X%X%X carrierPhase: %X%X%X%X carrierFreq: %X%X%X%X carrierAccel: %X%X millisec: %X%X bit#%X%X%X%X";
                   say parsed_raw "          codeCorrections: %X%X%X%X smoothCode: %X%X%X%X zeroes (%X%X%X%X) codeOffset: %X%X%X%X pseudorangeNoise: %X%X deltaRangeQuality: %X%X phaselockQuality: %X%X";
                   say parsed_raw "          (unk: %X%X%X%X%X%X%X%X) entries: %X -- " .  "(%X%X) " x 10;
