@@ -5,7 +5,9 @@
 #### This one packet causes all that stuff down! ###
 16:21:40.138 currently unsupported LEAD-IN 843B: 00/00/0006 16:21:40.138 (0) 
 
-? 84 3B 00 00 00 00 04 B5 C7 20 00 03 6C FE 37 FD 02 C4 00 00 EE 20 00 00 00 03 00 55 05 DC 00 00 16 A8 07 06 03 00 00 0B 00 7E 00 00 00 00 05 AF 2D A1 04 00 
+? 84 3B 00 
+? 00 00 00 04 -- might be increasing (or same) counter of some sort?
+? B5 C7 20 00 03 6C FE 37 FD 02 C4 00 00 EE 20 00 00 00 03 00 55 05 DC 00 00 16 A8 07 06 03 00 00 0B 00 7E 00 00 00 00 05 AF 2D A1 04 00 
 
 + 1D -- match, SVID!
 ? 00 02 BD 
