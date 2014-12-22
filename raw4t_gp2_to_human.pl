@@ -312,7 +312,7 @@ while (<>) {
           
 
           default {
-            say "skip lead-in 0x$LEAD_IN unknown CMD 0x$CMD SUB 0x$SUB $rest" if $DEBUG > 0;
+            say "skip lead-in 0x$LEAD_IN unknown CMD 0x$CMD SUB 0x$SUB $rest (FIXME)" if $DEBUG > 0;
             #next; # FIXME DELME
             my $count=0;
             while (@data) {
@@ -373,9 +373,9 @@ while (<>) {
     } elsif ($LEAD_IN =~ /^8E01$/) {
         say "$time$msec LEAD-IN of 0x$LEAD_IN MAYBE related to SiRFbinary MID 92 (0x5C) - CW Controller Output, SID 1? (logically, but no data match found)";
     } elsif ($LEAD_IN =~ /^8E02$/) {
-        say "$time$msec LEAD-IN of 0x$LEAD_IN equivalent to SiRFbinary MID 92 (0x5C) - CW Controller Output, SID 2! (FIXME - more parsing if we need it)";
+        say "$time$msec LEAD-IN of 0x$LEAD_IN equivalent to SiRFbinary MID 92 (0x5C) - CW Controller Output, SID 2! (not interesting?)";
     } elsif ($LEAD_IN =~ /^8F0[12]$/) {
-        say "$time$msec LEAD-IN of 0x$LEAD_IN equivalent to SiRFbinary MID 93 (0x5D) - TCXO Output! (FIXME - more parsing if we need it)";
+        say "$time$msec LEAD-IN of 0x$LEAD_IN equivalent to SiRFbinary MID 93 (0x5D) - TCXO Output! (not interesting?)";
     } else {
         print "$time$msec currently unsupported LEAD-IN $LEAD_IN: $_";
         next;
