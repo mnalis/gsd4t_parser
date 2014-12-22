@@ -347,31 +347,26 @@ while (<>) {
     } elsif ($LEAD_IN =~ /^82..$/) {
         say "$time$msec LEAD-IN of 0x82 is part of SiRFbinary MID 64 (0x40) - Nav Library, SID 1 GPS Data (FIXME - more parsing if we need it)";
     } elsif ($LEAD_IN =~ /^84..$/) {
-        say "$time$msec LEAD-IN of 0x84 might be part of SiRFbinary MID 64 (0x40), SID 2 - Navigation Library (NL) Auxiliary Measurement Data GPS Data (FIXME - more parsing if we need it)";
+        say "$time$msec LEAD-IN of $LEAD_IN might be part of SiRFbinary MID 64 (0x40), SID 2 - Navigation Library (NL) Auxiliary Measurement Data GPS Data (FIXME - more parsing of unknown values)";
         my $rest = join '', @data;
         say "  $time $LEAD_IN ($expected_len) $rest" if $DEBUG > 3;
         
         print "$time$msec ";
 
-        given ("$LEAD_IN") {
-          when (['843B', '8445']) {
-              say "FIXME LEAD-IN $LEAD_IN --  XXX";
-              say "\t" . parsed_raw 'unknown %X, maybe_counter %X%X%X%X';
-              say "\t" . parsed_raw 'unknown header stuff: ' . '%X ' x 43;
-              my $num_sv = hex get_byte(1);
-              say "\t" . parsed_raw "number of entries $num_sv (zero %X)";
-              while ($num_sv--) {
-                  say parsed_raw "    SVID: %X (unk: %X%X%X) timeTag:%X%X%X%X codePhase: %X%X%X%X carrierPhase: %X%X%X%X carrierFreq: %X%X%X%X carrierAccel: %X%X millisec: %X%X bit#%X%X%X%X";
-                  say parsed_raw "          codeCorrections: %X%X%X%X smoothCode: %X%X%X%X zeroes (%X%X%X%X) codeOffset: %X%X%X%X pseudorangeNoise: %X%X deltaRangeQuality: %X%X phaselockQuality: %X%X";
-                  say parsed_raw "          (unk: %X%X%X%X%X%X%X%X) entries: %X -- " .  "(%X%X) " x 10;
-                  say parsed_raw "          sumI: %X%X subQ: %X%X SVbit#%X%X%X%X MpathLosDetVal: %X%X MpathOnlyDetVal: %X%X (unk: %X%X%X)";
-              }
-                # if we parsed packet correctly, there should be NO data remaining...
-                if (@data) {
-                  die "finished decoding packet, but data still remains: @data";
-                }    
-          }
+        say "\t" . parsed_raw 'unknown %X, maybe_counter %X%X%X%X';
+        say "\t" . parsed_raw 'unknown header stuff: ' . '%X ' x 43;
+        my $num_sv = hex get_byte(1);
+        say "\t" . parsed_raw "number of entries $num_sv (zero %X)";
+        while ($num_sv--) {
+              say parsed_raw "    SVID: %X (unk: %X%X%X) timeTag:%X%X%X%X codePhase: %X%X%X%X carrierPhase: %X%X%X%X carrierFreq: %X%X%X%X carrierAccel: %X%X millisec: %X%X bit#%X%X%X%X";
+              say parsed_raw "          codeCorrections: %X%X%X%X smoothCode: %X%X%X%X zeroes (%X%X%X%X) codeOffset: %X%X%X%X pseudorangeNoise: %X%X deltaRangeQuality: %X%X phaselockQuality: %X%X";
+              say parsed_raw "          (unk: %X%X%X%X%X%X%X%X%X) -- list of 10 somethings: " .  "(%X%X) " x 10;
+              say parsed_raw "          sumI: %X%X sumQ: %X%X SVbit#%X%X%X%X MpathLosDetVal: %X%X MpathOnlyDetVal: %X%X (unk: %X%X%X)";
         }
+        # if we parsed packet correctly, there should be NO data remaining...
+        if (@data) {
+              die "finished decoding packet, but data still remains: @data";
+        }    
           
     } elsif ($LEAD_IN =~ /^85..$/) {
         say "$time$msec LEAD-IN of 0x$LEAD_IN is (sometimes multiple) part of SiRFbinary MID 8 (0x08) - 50 BPS data subframe, extract leap-second from this (FIXME - more parsing if we need it)";
