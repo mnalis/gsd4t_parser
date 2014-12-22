@@ -107,7 +107,7 @@ while (<>) {
     my $cnt = $length;
     while ($cnt--) {
       my $byte = shift @data;
-      if (!defined $byte) { die "not enough payload: need $cnt more in $_" }
+      if (!defined $byte) { die "not enough payload: need $cnt more in $_" }	# FIXME: dies sometimes  (see gsd4t_logs/strace4/strace.log.3491.parsed.txt)
       $p_payload .= "$byte ";
     }
     print "  payload ==> $p_payload\n" if $DEBUG > 7;
