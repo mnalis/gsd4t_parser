@@ -93,6 +93,7 @@ sub get_double() {
 #   %c is 1-byte char
 #   %s is variable length (AND 0-terminated) array of chars (C string prefixed with length)
 #   %X (special) is 1-byte hex value
+#   %B (special) is 1-byte binary value
 #   %0 (special) - read 1-byte value and discard it, not printing anything
 sub parsed_raw($) {
     # FIXME - maybe we should just use sprintf() instead trying to reinvent it badly?
@@ -117,6 +118,7 @@ sub parsed_raw($) {
                 return $r;
             }
             when ('X') { return get_byte(1) }
+            when ('B') { return sprintf ("%08b", hex get_byte(1)) }
             when ('0') { get_byte(1); return '' }
             default { die "parse_one: unknown format char %$format" }
         }
@@ -351,8 +353,6 @@ while (<>) {
         my $rest = join '', @data;
         say "  $time $LEAD_IN ($expected_len) $rest" if $DEBUG > 3;
         
-        print "$time$msec ";
-
         say "\t" . parsed_raw 'unknown %X, maybe_counter %X%X%X%X';
         say "\t" . parsed_raw 'unknown header stuff: ' . '%X ' x 43;
         my $num_sv = hex get_byte(1);
@@ -374,11 +374,14 @@ while (<>) {
         # and http://en.wikipedia.org/wiki/GPS_signals#Navigation_message
         # L1 C/A -- The current “legacy” Navigation Message (NAV) is modulated on both carriers at 50 bps. The whole message contains 25 pages (or ’frames’) of 30 seconds each, forming the master frame that takes 12,5 minutes to be transmitted. Every frame is subdivided into 5 sub-frames of 6 seconds each; in turn, every sub-frame consists of 10 words, with 30 bits per word (see figure 3). Every sub-frame always starts with the telemetry word (TLM), which is necessary for synchronism. Next, the transference word (HOW) appears. This word provides time information (seconds of the GPS week), allowing the receiver to acquire the week-long P(Y)-code segment. 
         # and most of all GPS-Subframe-Decode.git and gps_compendiumgps-x-02007.pdf
+        #
+        # 25 pages (in 12.5 minutes). Each page consists of 5 subframes. Each subframe 10 dwords (of 30 bits each).
+        #
         my $num_sub = hex get_byte(1);
         say "    " . parsed_raw "number of 50Bps sub-frames: $num_sub";
         while ($num_sub--) {
               say "    " . parsed_raw "from SVID %X (unk %X%X%X%X%X%X%X)";
-              say parsed_raw "\t50Bps raw 10 30-bit (FIXME expanded to 32-bit?) words: " . "%X%X%X%X "x10;
+              say parsed_raw "\t50Bps raw 10 30-bit (FIXME expanded to 32-bit?) words: " . "\n\t  %B %B %B %B"x10;
         }
         # if we parsed packet correctly, there should be NO data remaining...
         if (@data) {
