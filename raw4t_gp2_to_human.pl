@@ -373,6 +373,7 @@ while (<>) {
         # FIXME http://www.navipedia.net/index.php/GPS_Navigation_Message
         # and http://en.wikipedia.org/wiki/GPS_signals#Navigation_message
         # L1 C/A -- The current “legacy” Navigation Message (NAV) is modulated on both carriers at 50 bps. The whole message contains 25 pages (or ’frames’) of 30 seconds each, forming the master frame that takes 12,5 minutes to be transmitted. Every frame is subdivided into 5 sub-frames of 6 seconds each; in turn, every sub-frame consists of 10 words, with 30 bits per word (see figure 3). Every sub-frame always starts with the telemetry word (TLM), which is necessary for synchronism. Next, the transference word (HOW) appears. This word provides time information (seconds of the GPS week), allowing the receiver to acquire the week-long P(Y)-code segment. 
+        # and most of all GPS-Subframe-Decode.git and gps_compendiumgps-x-02007.pdf
         my $num_sub = hex get_byte(1);
         say "    " . parsed_raw "number of 50Bps sub-frames: $num_sub";
         while ($num_sub--) {
