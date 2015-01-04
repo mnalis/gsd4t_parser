@@ -237,7 +237,41 @@ sub parse_50bps_subframe() {
         say "\t   TOW=$TOW_trunc alert=$HOW_alert antispoof=$HOW_antispoof subframe_ID=$HOW_subframe_ID";
         
         # FIMXE we should parse depending on subpage only if TLM/HOW passed sanity/parity checks...
-        if ($HOW_subframe_ID == 3) {		# subframe 3 = Ephemeris data
+        if ($HOW_subframe_ID == 2) {		# subframe 2 (Ephemeris data)
+            get_30bits;	# dword 3
+            my ($IODE, $Crs) = parse_30bit (8,16);
+            $IODE = bin2dec($IODE); $Crs = bin2dec($Crs);
+            
+            get_30bits;	# dword 4
+            my ($delta_n, $M0_MSB) = parse_30bit (16,8);
+            $delta_n = bin2dec($delta_n);
+            
+            get_30bits;	# dword 5
+            my ($M0_LSB) = parse_30bit (24);
+            my $M0 = bin2dec($M0_MSB . $M0_LSB); undef $M0_LSB; undef $M0_MSB;
+                        
+            get_30bits;	# dword 6
+            my ($Cuc, $e_MSB) = parse_30bit (16,8);
+            $Cuc = bin2dec($Cuc);
+            
+            get_30bits;	# dword 7
+            my ($e_LSB) = parse_30bit (24);
+            my $e = bin2dec($e_MSB . $e_LSB); undef $e_LSB; undef $e_MSB;
+            
+            get_30bits;	# dword 8
+            my ($Cus, $sqrt_A_MSB) = parse_30bit (16,8);
+            $Cus = bin2dec($Cus);
+            
+            get_30bits;	# dword 9
+            my ($sqrt_A_LSB) = parse_30bit (24);
+            my $sqrt_A = bin2dec ($sqrt_A_MSB . $sqrt_A_LSB); undef $sqrt_A_LSB; undef $sqrt_A_MSB;
+            
+            get_30bits;	# dword 10
+            my ($toe, $fit_interval, $AODO, undef) = parse_30bit (16,1,5,2);
+            $toe = bin2dec($toe); $AODO = bin2dec ($AODO);
+            
+            say "\tIODE=$IODE Crs=$Crs delta_n=$delta_n M0=$M0 Cuc=$Cuc e=$e Cus=$Cus sqrt_A=$sqrt_A toe=$toe fit_interval=$fit_interval AODO=$AODO";
+        } elsif ($HOW_subframe_ID == 3) {		# subframe 3 (Ephemeris data)
             get_30bits;	# dword 3
             my ($Cic, $OMEGA0_MSB) = parse_30bit (16,8);
             $Cic = bin2dec($Cic);
