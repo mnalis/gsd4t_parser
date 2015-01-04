@@ -44,6 +44,12 @@ sub get_byte($) {
 }
 
 
+# converts binary string to decimal number
+sub bin2dec($) {
+  my ($bin) = @_;
+  return oct('0b' . $bin);	# funny function name, yeah. See perldoc -f oct
+}
+
 # returns variable-length variable
 sub get_var() {
     my $size = get_byte(1);
@@ -183,9 +189,9 @@ sub parse_50bps_subframe() {
                 my ($data) = @_;
                 my @D = ('_', split (//, $data));	# D1..D30 == bits as transmited by SV
                 my @d = ('_');				# d1..d24 == source data bits. We use '_' as index 0, so we can use GPS notation (first bit = #1, not #0)
-                say "input  D[]=" . join('.', @D);
+#                say "input  D[]=" . join('.', @D);
                 for my $i (1..24) { $d[$i] = eor($D[$i], $old_D30) };
-                say "source d[]=" . join('.', @d);
+#                say "source d[]=" . join('.', @d);
                 $D[25] = eor ($old_D29, $d[1], $d[2], $d[3], $d[5], $d[6], $d[10], $d[11], $d[12], $d[13], $d[14], $d[17], $d[18], $d[20], $d[23] );
                 $D[26] = eor ($old_D30, $d[2], $d[3], $d[4], $d[6], $d[7], $d[11], $d[12], $d[13], $d[14], $d[15], $d[18], $d[19], $d[21], $d[24] );
                 $D[27] = eor ($old_D29, $d[1], $d[3], $d[4], $d[5], $d[7], $d[8],  $d[12], $d[13], $d[14], $d[15], $d[16], $d[19], $d[20], $d[22] );
@@ -193,8 +199,7 @@ sub parse_50bps_subframe() {
                 $D[29] = eor ($old_D30, $d[1], $d[3], $d[5], $d[6], $d[7], $d[9],  $d[10], $d[14], $d[15], $d[16], $d[17], $d[18], $d[21], $d[22], $d[24] );
                 $D[30] = eor ($old_D29, $d[3], $d[5], $d[6], $d[8], $d[9], $d[10], $d[11], $d[13], $d[15], $d[19], $d[22], $d[23], $d[24] );
                 
-                say "output D[]=" .  join('.', @D);
-                
+#                say "output D[]=" .  join('.', @D);
                 
                 $old_D29 = $D[29]; $old_D30 = $D[30];
                 return "$D[25]$D[26]$D[27]$D[28]$D[29]$D[30]";	# return just parity bits (D25..D30)
@@ -227,13 +232,21 @@ sub parse_50bps_subframe() {
         # every subframe continues with HOW (handover word)
         get_30bits; 
         say "\tHOW=$b30_dword";
-        my ($TOW, $HOW_div_ID) = parse_30bit (17,7);
-        say "\t   TOW=$TOW HOW_div_ID=$HOW_div_ID";
+        my ($TOW_trunc, $HOW_alert, $HOW_antispoof, $HOW_subID, $HOW_parityfix) = parse_30bit (17,1,1,3,2);
+        $TOW_trunc = bin2dec($TOW_trunc); $HOW_subID=bin2dec($HOW_subID);	# convert to decimal instead of binary
+        say "\t   TOW=$TOW_trunc alert=$HOW_alert antispoof=$HOW_antispoof subframe_ID=$HOW_subID";
         
+        # verify parity on rest of words (FIXME - we should parse it depending on subpage! if TLM/HOW passed sanity/parity checks)
+        for my $dword (3..10) {
+          print "\tDWORD $dword = ";
+          get_30bits;
+          my ($dword_data) = parse_30bit(24);
+          say "\t    $dword_data";
+        }
         
         
         # FIXME get remaining stuff
-        say parsed_raw "\t50Bps raw 10 30-bit (expanded to 32-bit - FIXME just remaining 8 out of 10) words: " . "\n\t  %B %B %B %B"x8;
+        #say parsed_raw "\t50Bps raw 10 30-bit (expanded to 32-bit - FIXME just remaining 8 out of 10) words: " . "\n\t  %B %B %B %B"x8;
 }
 
 
