@@ -10,7 +10,7 @@ use strict;
 use autodie;
 use feature "switch";
 use feature "say";
-use Tie::IxHash;
+use Tie::IxHash;	# needed to preserve order of 'keys %array'
 use Readonly;
 
 my $DEBUG = 3;
@@ -170,10 +170,27 @@ sub parse_50bps_subframe() {
         our $b30_dword = '';
         our $old_D29 = '0';	# needed for (32,26) Hamming Code parity calculation
         our $old_D30 = '0';	# needed for (32,26) Hamming Code parity calculation
+        our $word_count = 1;	# number of 30-bit words which have already been read
+        our $inverted_preamble = 0;	# if preamble is inverted, need to invert all bits in subframe!
         
         sub get_30bits() {	# returns 30 bits dword
             die "data remaining in b30=$b30_dword, and should be empty!" if length($b30_dword) != 0;
             $b30_dword = substr (sprintf ("%032b", hex get_byte(4)),2);
+            if ($word_count == 1) {	# we are reading TLM word
+                say "word_count=1, reading TLM = " . substr($b30_dword, 0, 8);
+                if (substr($b30_dword, 0, 8) eq '10001011') {		# normal TLM preamble, do nothing
+                    $inverted_preamble = 0;	
+                } elsif (substr($b30_dword, 0, 8) eq '01110100') {	# inverted TLM preamble, we'll need to invert all words
+                    $inverted_preamble = 1;	
+                    say "\t(inverted preamble 01110100 found; we'll invert all words in this subframe)"
+                }
+            }
+            if ($inverted_preamble) {
+                #say "\tinverting word $word_count. before = $b30_dword";
+                $b30_dword =~ tr/01/10/;
+                #say "\tinverting word $word_count. after  = $b30_dword";
+            }
+            $word_count++;
         }
         
         sub next_x_bits($) {	# returns next x bits from 30-bit dword $b30_dword (and truncate it)
@@ -221,7 +238,7 @@ sub parse_50bps_subframe() {
         }
             
         
-        sub parse_subframe {		# parse whole subframe given hash subframe bit definition
+        sub parse_subframe_data_words_3_10 {		# parse rest of subframe (words 3-10) given hash subframe bit definition
             my $format_ref = shift;
             my $subframe_data = '';
             my %ret = (); tie %ret, 'Tie::IxHash';
@@ -263,11 +280,9 @@ sub parse_50bps_subframe() {
         say "\t   TOW=$TOW_trunc alert=$HOW_alert antispoof=$HOW_antispoof subframe_ID=$HOW_subframe_ID";
         
         # FIMXE we should parse depending on subpage only if TLM/HOW passed sanity/parity checks...
-        if ($HOW_subframe_ID == 2) {		# subframe 2 (Ephemeris data)
+        if ($HOW_subframe_ID == 2) {			# subframe 2 (Ephemeris data)
             my Readonly %subframe_format; 
-            tie %subframe_format, 'Tie::IxHash';	# needed to preserve order of 'keys %array'
-            
-            %subframe_format = (
+            tie %subframe_format, 'Tie::IxHash', (
                 IODE => 8,
                 Crs => 16,
                 delta_n => 16,
@@ -281,13 +296,11 @@ sub parse_50bps_subframe() {
                 AODO => 5,
                 parity_fix => 2
             );
+            parse_subframe_data_words_3_10 (\%subframe_format);
             
-            parse_subframe (\%subframe_format);
         } elsif ($HOW_subframe_ID == 3) {		# subframe 3 (Ephemeris data)
             my Readonly %subframe_format; 
-            tie %subframe_format, 'Tie::IxHash';	# needed to preserve order of 'keys %array'
-            
-            %subframe_format = (
+            tie %subframe_format, 'Tie::IxHash', (
                 Cic => 16,
                 OMEGA0 => 8+24,
                 Cis => 16,
@@ -299,8 +312,8 @@ sub parse_50bps_subframe() {
                 IDOT => 14,
                 parity_fix => 2
             );
+            parse_subframe_data_words_3_10 (\%subframe_format);
             
-            parse_subframe (\%subframe_format);
         } else {				# FIXME - all other subframes not parsed yet. 
           # verify parity on rest of words 
           for my $dword (3..10) {
