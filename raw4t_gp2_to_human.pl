@@ -177,7 +177,7 @@ sub parse_50bps_subframe() {
             die "data remaining in b30=$b30_dword, and should be empty!" if length($b30_dword) != 0;
             $b30_dword = substr (sprintf ("%032b", hex get_byte(4)),2);
             if ($word_count == 1) {	# we are reading TLM word
-                say "word_count=1, reading TLM = " . substr($b30_dword, 0, 8);
+                #say "\tword_count=1, reading TLM = " . substr($b30_dword, 0, 8);
                 if (substr($b30_dword, 0, 8) eq '10001011') {		# normal TLM preamble, do nothing
                     $inverted_preamble = 0;	
                 } elsif (substr($b30_dword, 0, 8) eq '01110100') {	# inverted TLM preamble, we'll need to invert all words
