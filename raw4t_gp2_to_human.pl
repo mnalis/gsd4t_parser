@@ -157,6 +157,52 @@ sub parse_subpackets ($$) {
   return $str;
 }
 
+# 50BPS data, parsing one subframe 
+sub parse_50bps_subframe() {
+        our $b30 = '';
+        sub get_30bits() {	# returns 30 bits dword
+            die "data remaining in b30=$b30, and should be empty!" if length($b30) != 0;
+            $b30 = substr (sprintf ("%032b", hex get_byte(4)),2);
+        }
+        sub next_x_bits($) {	# returns next x bits from 30-bit dword $b30 (and truncate it)
+            my ($num_bits) = @_;
+            return substr ($b30, 0, $num_bits, '');
+        }
+        sub parse_30bit {	# parse all bitfields from 30bit word
+            my @ret = ();
+            my $count = 0;
+            while (my $bits = shift) {
+                push @ret, next_x_bits($bits);
+                $count += $bits;
+            }
+            die "did not parse all 30 bits: $count" if $count != 30;
+            return @ret;
+        }
+            
+        
+        # every subframe starts with TLM (telemetry word)
+        get_30bits; 
+        say "\tTLM=$b30";
+        my ($TLM_preamble, $TLM_message, $TLM_r2, $TLM_parity) = parse_30bit (8,14,2,6);
+        say "\t   preamble=$TLM_preamble msg=$TLM_message reserved=$TLM_r2 parity=$TLM_parity";
+        if ($TLM_preamble ne '10001011') {
+            say parsed_raw "\t  INVALID TLM PREAMBLE. Remaining 50Bps raw 30-bit (expanded to 32-bit) words are: " . "\n\t  %B %B %B %B"x9;
+            return;
+        }
+        
+        # every subframe continues with HOW (handover word)
+        get_30bits; 
+        say "\tHOW=$b30";
+        my ($TOW, $HOW_div_ID, $HOW_parity) = parse_30bit (17,7,6);
+        say "\t   TOW=$TOW HOW_div_ID=$HOW_div_ID parity=$HOW_parity";
+        
+        
+        
+        # FIXME get remaining stuff
+        say parsed_raw "\t50Bps raw 10 30-bit (expanded to 32-bit - FIXME just remaining 8 out of 10) words: " . "\n\t  %B %B %B %B"x8;
+}
+
+
 ######### MAIN ##########
 while (<>) {
   next if /^\s*$/;	# skip empty lines
@@ -381,7 +427,7 @@ while (<>) {
         say "    " . parsed_raw "number of 50Bps sub-frames: $num_sub";
         while ($num_sub--) {
               say "    " . parsed_raw "from SVID %X (unk %X%X%X%X%X%X%X)";
-              say parsed_raw "\t50Bps raw 10 30-bit (FIXME expanded to 32-bit?) words: " . "\n\t  %B %B %B %B"x10;
+              parse_50bps_subframe();
         }
         # if we parsed packet correctly, there should be NO data remaining...
         if (@data) {
