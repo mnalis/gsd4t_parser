@@ -144,12 +144,13 @@ while (<>) {
           printf "  GPS location fix found!\n";
           my ($x, $y, $z) = (getbes32, getbes32, getbes32);
           printf "   x=%d y=%d z=%d\n", $x, $y, $z;
-          {
-            use Geo::ECEF;
+          eval {
+            require Geo::ECEF;
             my $obj=Geo::ECEF->new(); #WGS84 is the default
             my ($lat, $lon, $hae)=$obj->geodetic($x, $y, $z);
             printf "     (lat=$lat, lon=$lon, HAE=$hae -- FIXME ECEF calc precision?)\n";
-          }
+          };
+          say "     (WARNING: No Geo::ECEF found, not calculating WGS84)" if $@;
           printf "   xv=%f yv=%f zv=%f\n", getbes16 / 8, getbes16 / 8, getbes16 / 8;
           printf "   mode1=0x%x HDOP=%f mode2=0x%x\n", getub, getub / 5, getub;
           my $week=getbes16; my $TOW = getbeu32 / 100;
