@@ -214,7 +214,7 @@ sub parse_50bps_subframe() {
             my $verify_parity = next_x_bits(6);
             die "did not parse all 30 bits: $count" if $count != 30;
             my $calc_parity = calc_parity(join('',@ret) . $verify_parity);
-            say "\t\t(parity " . (($calc_parity eq $verify_parity) ? "is valid $verify_parity)":"check HAS FAILED - $calc_parity should be $verify_parity !)");
+            say "\t   (parity " . (($calc_parity eq $verify_parity) ? "is valid $verify_parity)":"check HAS FAILED - $calc_parity should be $verify_parity !)");
             return @ret;
         }
             
@@ -222,26 +222,63 @@ sub parse_50bps_subframe() {
         # every subframe starts with TLM (telemetry word)
         get_30bits; 
         say "\tTLM=$b30_dword";
-        my ($TLM_preamble, $TLM_message, $TLM_r2) = parse_30bit (8,14,2);
-        say "\t   preamble=$TLM_preamble msg=$TLM_message reserved=$TLM_r2";
+        my ($TLM_preamble, $TLM_message, $TLM_integrity, $TLM_reserver) = parse_30bit (8,14,1,1);
+        say "\t   preamble=$TLM_preamble extra_integrity=$TLM_integrity";
         if ($TLM_preamble ne '10001011') {
-            say parsed_raw "\t  INVALID TLM PREAMBLE. Remaining 50Bps raw 30-bit (expanded to 32-bit) words are: " . "\n\t  %X %X %X %X"x9;
+            say parsed_raw "\t  INVALID TLM PREAMBLE (Should be 10001011). Remaining 50Bps raw 30-bit words are: " . "\n\t  %X %X %X %X"x9;
             return;
         }
         
         # every subframe continues with HOW (handover word)
         get_30bits; 
         say "\tHOW=$b30_dword";
-        my ($TOW_trunc, $HOW_alert, $HOW_antispoof, $HOW_subID, $HOW_parityfix) = parse_30bit (17,1,1,3,2);
-        $TOW_trunc = bin2dec($TOW_trunc); $HOW_subID=bin2dec($HOW_subID);	# convert to decimal instead of binary
-        say "\t   TOW=$TOW_trunc alert=$HOW_alert antispoof=$HOW_antispoof subframe_ID=$HOW_subID";
+        my ($TOW_trunc, $HOW_alert, $HOW_antispoof, $HOW_subframe_ID, $HOW_parityfix) = parse_30bit (17,1,1,3,2);
+        $TOW_trunc = bin2dec($TOW_trunc); $HOW_subframe_ID=bin2dec($HOW_subframe_ID);	# convert to decimal instead of binary
+        say "\t   TOW=$TOW_trunc alert=$HOW_alert antispoof=$HOW_antispoof subframe_ID=$HOW_subframe_ID";
         
-        # verify parity on rest of words (FIXME - we should parse it depending on subpage! if TLM/HOW passed sanity/parity checks)
-        for my $dword (3..10) {
-          print "\tDWORD $dword = ";
-          get_30bits;
-          my ($dword_data) = parse_30bit(24);
-          say "\t    $dword_data";
+        # FIMXE we should parse depending on subpage only if TLM/HOW passed sanity/parity checks...
+        if ($HOW_subframe_ID == 3) {		# subframe 3 = Ephemeris data
+            get_30bits;	# dword 3
+            my ($Cic, $OMEGA0_MSB) = parse_30bit (16,8);
+            $Cic = bin2dec($Cic);
+            
+            get_30bits;	# dword 4
+            my ($OMEGA0_LSB) = parse_30bit (24);
+            my $OMEGA0 = bin2dec($OMEGA0_MSB . $OMEGA0_LSB); undef $OMEGA0_LSB; undef $OMEGA0_MSB;
+            
+            get_30bits;	# dword 5
+            my ($Cis, $i0_MSB) = parse_30bit (16,8);
+            $Cis = bin2dec($Cis);
+                        
+            get_30bits;	# dword 6
+            my ($i0_LSB) = parse_30bit (24);
+            my $i0 = bin2dec($i0_MSB . $i0_LSB); undef $i0_MSB; undef $i0_LSB;
+            
+            get_30bits;	# dword 7
+            my ($Crc, $omega_MSB) = parse_30bit (16,8);
+            $Crc = bin2dec($Crc);
+            
+            get_30bits;	# dword 8
+            my ($omega_LSB) = parse_30bit (24);
+            my $omega = bin2dec($omega_MSB . $omega_LSB); undef $omega_LSB; undef $omega_MSB;
+            
+            get_30bits;	# dword 9
+            my ($OMEGA_DOT) = parse_30bit (24);
+            $OMEGA_DOT = bin2dec($OMEGA_DOT);
+            
+            get_30bits;	# dword 10
+            my ($IODE, $IDOT, undef) = parse_30bit (8,14,2);
+            $IODE = bin2dec($IODE); $IDOT = bin2dec($IDOT);
+            
+            say "\tCic=$Cic OMEGA0=$OMEGA0 Cis=$Cis i0=$i0 Crc=$Crc omega=$omega OMEGA_DOT=$OMEGA_DOT IODE=$IODE IDOT=$IDOT";
+        } else {				# FIXME - all other subframes not parsed yet. 
+          # verify parity on rest of words 
+          for my $dword (3..10) {
+            print "\tDWORD $dword (FIXME unparsed yet) = ";
+            get_30bits;
+            my ($dword_data) = parse_30bit(24);
+            say "\t    $dword_data";
+          }
         }
         
         
