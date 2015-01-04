@@ -10,6 +10,8 @@ use strict;
 use autodie;
 use feature "switch";
 use feature "say";
+use Tie::IxHash;
+use Readonly;
 
 my $DEBUG = 3;
 $| = 1;
@@ -219,6 +221,30 @@ sub parse_50bps_subframe() {
         }
             
         
+        sub parse_subframe {		# parse whole subframe given hash subframe bit definition
+            my $format_ref = shift;
+            my $subframe_data = '';
+            my %ret = (); tie %ret, 'Tie::IxHash';
+            my $count = 0;
+            for (3..10) { get_30bits; $subframe_data .= (parse_30bit(30-6))[0] }	# DWORD 3-10 : fetch all data (minus parity)
+            # say "subframe_data = $subframe_data";
+            foreach my $key (keys %$format_ref) {
+                my $bits_needed = $$format_ref{$key};
+                $count += $bits_needed;
+                #say "format{$key} = $bits_needed (total bits used $count / 192)";	# 192 content bits = (30-6 parity bits) * (10-2 [TLM,HOW] words)
+                $ret{$key} = bin2dec(substr($subframe_data, $count-$bits_needed, $bits_needed));		# fetch required number of bits and truncate $subframe_data
+                #say "\tvalue=$ret{$key}";
+            }
+            if ($count != 192) { die "invalid number of data bits used $count != 192" }
+            
+            print "\tSUBFRAME PARSED: ";
+            foreach my $key (keys %ret) {
+                print "$key=$ret{$key} ";
+            }
+            say '.';
+        }
+        
+        
         # every subframe starts with TLM (telemetry word)
         get_30bits; 
         say "\tTLM=$b30_dword";
@@ -238,73 +264,43 @@ sub parse_50bps_subframe() {
         
         # FIMXE we should parse depending on subpage only if TLM/HOW passed sanity/parity checks...
         if ($HOW_subframe_ID == 2) {		# subframe 2 (Ephemeris data)
-            get_30bits;	# dword 3
-            my ($IODE, $Crs) = parse_30bit (8,16);
-            $IODE = bin2dec($IODE); $Crs = bin2dec($Crs);
+            my Readonly %subframe_format; 
+            tie %subframe_format, 'Tie::IxHash';	# needed to preserve order of 'keys %array'
             
-            get_30bits;	# dword 4
-            my ($delta_n, $M0_MSB) = parse_30bit (16,8);
-            $delta_n = bin2dec($delta_n);
+            %subframe_format = (
+                IODE => 8,
+                Crs => 16,
+                delta_n => 16,
+                M0 => 8+24,
+                Cuc => 16,
+                e => 8+24,
+                Cus => 16,
+                sqrt_A => 8+24,
+                toe => 16, 
+                fit_interval => 1,
+                AODO => 5,
+                parity_fix => 2
+            );
             
-            get_30bits;	# dword 5
-            my ($M0_LSB) = parse_30bit (24);
-            my $M0 = bin2dec($M0_MSB . $M0_LSB); undef $M0_LSB; undef $M0_MSB;
-                        
-            get_30bits;	# dword 6
-            my ($Cuc, $e_MSB) = parse_30bit (16,8);
-            $Cuc = bin2dec($Cuc);
-            
-            get_30bits;	# dword 7
-            my ($e_LSB) = parse_30bit (24);
-            my $e = bin2dec($e_MSB . $e_LSB); undef $e_LSB; undef $e_MSB;
-            
-            get_30bits;	# dword 8
-            my ($Cus, $sqrt_A_MSB) = parse_30bit (16,8);
-            $Cus = bin2dec($Cus);
-            
-            get_30bits;	# dword 9
-            my ($sqrt_A_LSB) = parse_30bit (24);
-            my $sqrt_A = bin2dec ($sqrt_A_MSB . $sqrt_A_LSB); undef $sqrt_A_LSB; undef $sqrt_A_MSB;
-            
-            get_30bits;	# dword 10
-            my ($toe, $fit_interval, $AODO, undef) = parse_30bit (16,1,5,2);
-            $toe = bin2dec($toe); $AODO = bin2dec ($AODO);
-            
-            say "\tIODE=$IODE Crs=$Crs delta_n=$delta_n M0=$M0 Cuc=$Cuc e=$e Cus=$Cus sqrt_A=$sqrt_A toe=$toe fit_interval=$fit_interval AODO=$AODO";
+            parse_subframe (\%subframe_format);
         } elsif ($HOW_subframe_ID == 3) {		# subframe 3 (Ephemeris data)
-            get_30bits;	# dword 3
-            my ($Cic, $OMEGA0_MSB) = parse_30bit (16,8);
-            $Cic = bin2dec($Cic);
+            my Readonly %subframe_format; 
+            tie %subframe_format, 'Tie::IxHash';	# needed to preserve order of 'keys %array'
             
-            get_30bits;	# dword 4
-            my ($OMEGA0_LSB) = parse_30bit (24);
-            my $OMEGA0 = bin2dec($OMEGA0_MSB . $OMEGA0_LSB); undef $OMEGA0_LSB; undef $OMEGA0_MSB;
+            %subframe_format = (
+                Cic => 16,
+                OMEGA0 => 8+24,
+                Cis => 16,
+                i0 => 8+24,
+                Crc => 16,
+                omega => 8+24,
+                OMEGA_DOT => 24,
+                IODE => 8,
+                IDOT => 14,
+                parity_fix => 2
+            );
             
-            get_30bits;	# dword 5
-            my ($Cis, $i0_MSB) = parse_30bit (16,8);
-            $Cis = bin2dec($Cis);
-                        
-            get_30bits;	# dword 6
-            my ($i0_LSB) = parse_30bit (24);
-            my $i0 = bin2dec($i0_MSB . $i0_LSB); undef $i0_MSB; undef $i0_LSB;
-            
-            get_30bits;	# dword 7
-            my ($Crc, $omega_MSB) = parse_30bit (16,8);
-            $Crc = bin2dec($Crc);
-            
-            get_30bits;	# dword 8
-            my ($omega_LSB) = parse_30bit (24);
-            my $omega = bin2dec($omega_MSB . $omega_LSB); undef $omega_LSB; undef $omega_MSB;
-            
-            get_30bits;	# dword 9
-            my ($OMEGA_DOT) = parse_30bit (24);
-            $OMEGA_DOT = bin2dec($OMEGA_DOT);
-            
-            get_30bits;	# dword 10
-            my ($IODE, $IDOT, undef) = parse_30bit (8,14,2);
-            $IODE = bin2dec($IODE); $IDOT = bin2dec($IDOT);
-            
-            say "\tCic=$Cic OMEGA0=$OMEGA0 Cis=$Cis i0=$i0 Crc=$Crc omega=$omega OMEGA_DOT=$OMEGA_DOT IODE=$IODE IDOT=$IDOT";
+            parse_subframe (\%subframe_format);
         } else {				# FIXME - all other subframes not parsed yet. 
           # verify parity on rest of words 
           for my $dword (3..10) {
