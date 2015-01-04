@@ -187,9 +187,10 @@ A0A2 00  03F4 00A3 0014 CB5A 8E 02 03 01 43 03 71 00 00 00 00 00 00 00 00 00 00 
   # lsof | grep /dev/ttySAC1      # determine PID of system_server (2029) and FD of GPS device (275)
   system_se  2029     system  275       ???                ???       ???        ??? /dev/ttySAC1
 
-  # strace -e trace=open,read,write -e write=275 -e read=275 -tt -v -ff -o strace.log -s 4096 -p 2029
+  # strace -e trace=open,read -e read=275 -tt -v -ff -o strace-in.log -s 4096 -p 2029 &
+  # strace -e trace=open,write -e write=275 -tt -v -ff -o strace-out.log -s 4096 -p 2029 &
 
-  # (close your GPS app after some time and ctrl-c strace process)
+  # (close your GPS app after some time and  'fg' / ctrl-c strace processes)
 
   do not forget to replace 2029 and 275 numbers with ones you got from lsof command!
 
