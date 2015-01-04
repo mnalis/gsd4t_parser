@@ -159,42 +159,76 @@ sub parse_subpackets ($$) {
 
 # 50BPS data, parsing one subframe 
 sub parse_50bps_subframe() {
-        our $b30 = '';
+        our $b30_dword = '';
+        our $old_D29 = '0';	# needed for (32,26) Hamming Code parity calculation
+        our $old_D30 = '0';	# needed for (32,26) Hamming Code parity calculation
+        
         sub get_30bits() {	# returns 30 bits dword
-            die "data remaining in b30=$b30, and should be empty!" if length($b30) != 0;
-            $b30 = substr (sprintf ("%032b", hex get_byte(4)),2);
+            die "data remaining in b30=$b30_dword, and should be empty!" if length($b30_dword) != 0;
+            $b30_dword = substr (sprintf ("%032b", hex get_byte(4)),2);
         }
-        sub next_x_bits($) {	# returns next x bits from 30-bit dword $b30 (and truncate it)
+        
+        sub next_x_bits($) {	# returns next x bits from 30-bit dword $b30_dword (and truncate it)
             my ($num_bits) = @_;
-            return substr ($b30, 0, $num_bits, '');
+            return substr ($b30_dword, 0, $num_bits, '');
         }
-        sub parse_30bit {	# parse all bitfields from 30bit word
+        
+        sub parse_30bit {	# parse all bitfields from 30bit word and verify parity
+            sub eor {			# exclusive or / XOR (which works on array of characters)
+              my $x = (shift)+0;	# we convert character "0"/"1" to actual number, so we can XOR it
+              while (@_) { my $y = (shift)+0; $x = $x^$y; }	
+              return "$x";
+            }
+            sub calc_parity($) {	# calculates parity information of this word. See IS-GPS-200F.pdf "20.3.5.2 User Parity Algorithm."
+                my ($data) = @_;
+                my @D = ('_', split (//, $data));	# D1..D30 == bits as transmited by SV
+                my @d = ('_');				# d1..d24 == source data bits. We use '_' as index 0, so we can use GPS notation (first bit = #1, not #0)
+                say "input  D[]=" . join('.', @D);
+                for my $i (1..24) { $d[$i] = eor($D[$i], $old_D30) };
+                say "source d[]=" . join('.', @d);
+                $D[25] = eor ($old_D29, $d[1], $d[2], $d[3], $d[5], $d[6], $d[10], $d[11], $d[12], $d[13], $d[14], $d[17], $d[18], $d[20], $d[23] );
+                $D[26] = eor ($old_D30, $d[2], $d[3], $d[4], $d[6], $d[7], $d[11], $d[12], $d[13], $d[14], $d[15], $d[18], $d[19], $d[21], $d[24] );
+                $D[27] = eor ($old_D29, $d[1], $d[3], $d[4], $d[5], $d[7], $d[8],  $d[12], $d[13], $d[14], $d[15], $d[16], $d[19], $d[20], $d[22] );
+                $D[28] = eor ($old_D30, $d[2], $d[4], $d[5], $d[6], $d[8], $d[9],  $d[13], $d[14], $d[15], $d[16], $d[17], $d[20], $d[21], $d[23] );
+                $D[29] = eor ($old_D30, $d[1], $d[3], $d[5], $d[6], $d[7], $d[9],  $d[10], $d[14], $d[15], $d[16], $d[17], $d[18], $d[21], $d[22], $d[24] );
+                $D[30] = eor ($old_D29, $d[3], $d[5], $d[6], $d[8], $d[9], $d[10], $d[11], $d[13], $d[15], $d[19], $d[22], $d[23], $d[24] );
+                
+                say "output D[]=" .  join('.', @D);
+                
+                
+                $old_D29 = $D[29]; $old_D30 = $D[30];
+                return "$D[25]$D[26]$D[27]$D[28]$D[29]$D[30]";	# return just parity bits (D25..D30)
+            }
+            
             my @ret = ();
-            my $count = 0;
+            my $count = 6;
             while (my $bits = shift) {
                 push @ret, next_x_bits($bits);
                 $count += $bits;
             }
+            my $verify_parity = next_x_bits(6);
             die "did not parse all 30 bits: $count" if $count != 30;
+            my $calc_parity = calc_parity(join('',@ret) . $verify_parity);
+            say "\t\t(parity " . (($calc_parity eq $verify_parity) ? "is valid $verify_parity)":"check HAS FAILED - $calc_parity should be $verify_parity !)");
             return @ret;
         }
             
         
         # every subframe starts with TLM (telemetry word)
         get_30bits; 
-        say "\tTLM=$b30";
-        my ($TLM_preamble, $TLM_message, $TLM_r2, $TLM_parity) = parse_30bit (8,14,2,6);
-        say "\t   preamble=$TLM_preamble msg=$TLM_message reserved=$TLM_r2 parity=$TLM_parity";
+        say "\tTLM=$b30_dword";
+        my ($TLM_preamble, $TLM_message, $TLM_r2) = parse_30bit (8,14,2);
+        say "\t   preamble=$TLM_preamble msg=$TLM_message reserved=$TLM_r2";
         if ($TLM_preamble ne '10001011') {
-            say parsed_raw "\t  INVALID TLM PREAMBLE. Remaining 50Bps raw 30-bit (expanded to 32-bit) words are: " . "\n\t  %B %B %B %B"x9;
+            say parsed_raw "\t  INVALID TLM PREAMBLE. Remaining 50Bps raw 30-bit (expanded to 32-bit) words are: " . "\n\t  %X %X %X %X"x9;
             return;
         }
         
         # every subframe continues with HOW (handover word)
         get_30bits; 
-        say "\tHOW=$b30";
-        my ($TOW, $HOW_div_ID, $HOW_parity) = parse_30bit (17,7,6);
-        say "\t   TOW=$TOW HOW_div_ID=$HOW_div_ID parity=$HOW_parity";
+        say "\tHOW=$b30_dword";
+        my ($TOW, $HOW_div_ID) = parse_30bit (17,7);
+        say "\t   TOW=$TOW HOW_div_ID=$HOW_div_ID";
         
         
         
