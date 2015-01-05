@@ -301,6 +301,31 @@ sub parse_50bps_subframe() {
         
         # FIMXE we should parse depending on subpage only if TLM/HOW passed sanity/parity checks...
         given ($HOW_subframe_ID) {
+        
+            when (1) {				# subframe 1 (health and time)
+                my Readonly %subframe_format; 
+                tie %subframe_format, 'Tie::IxHash', (
+                    WN => 10,
+                    CA_or_P_L2 => 2,
+                    URA_idx => 4,
+                    SV_health => 6,
+                    IODC_MSB => 2,
+                    L2_P => 1, 
+                    reserved1 => 23, 
+                    reserved2 => 24,
+                    reserved3 => 24, 
+                    reserved4 => 16,
+                    Tgd => 8,
+                    IODC_LSB => 8,
+                    t_oc => 16,
+                    a_f2 => 8,
+                    a_f1 => 16,
+                    a_f0 => 22,
+                    parity_fix => 2
+                );
+                parse_subframe_data_words_3_10 (\%subframe_format);
+            }
+            
             when (2) {				# subframe 2 (Ephemeris data)
                 my Readonly %subframe_format; 
                 tie %subframe_format, 'Tie::IxHash', (
@@ -318,7 +343,6 @@ sub parse_50bps_subframe() {
                     parity_fix => 2
                 );
                 parse_subframe_data_words_3_10 (\%subframe_format);
-                
             } 
               
             when (3) {				# subframe 3 (Ephemeris data)
@@ -345,6 +369,7 @@ sub parse_50bps_subframe() {
                 get_30bits;
                 my ($dword_data) = parse_30bit(24);
                 say "\t    $dword_data";
+              }
             }
         }
         
