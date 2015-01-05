@@ -300,48 +300,52 @@ sub parse_50bps_subframe() {
 
         
         # FIMXE we should parse depending on subpage only if TLM/HOW passed sanity/parity checks...
-        if ($HOW_subframe_ID == 2) {			# subframe 2 (Ephemeris data)
-            my Readonly %subframe_format; 
-            tie %subframe_format, 'Tie::IxHash', (
-                IODE => 8,
-                Crs => 16,
-                delta_n => 16,
-                M0 => 8+24,
-                Cuc => 16,
-                e => 8+24,
-                Cus => 16,
-                sqrt_A => 8+24,
-                toe => 16, 
-                fit_interval => 1,
-                AODO => 5,
-                parity_fix => 2
-            );
-            parse_subframe_data_words_3_10 (\%subframe_format);
-            
-        } elsif ($HOW_subframe_ID == 3) {		# subframe 3 (Ephemeris data)
-            my Readonly %subframe_format; 
-            tie %subframe_format, 'Tie::IxHash', (
-                Cic => 16,
-                OMEGA0 => 8+24,
-                Cis => 16,
-                i0 => 8+24,
-                Crc => 16,
-                omega => 8+24,
-                OMEGA_DOT => 24,
-                IODE => 8,
-                IDOT => 14,
-                parity_fix => 2
-            );
-            parse_subframe_data_words_3_10 (\%subframe_format);
-            
-        } else {				# FIXME - all other subframes not parsed yet. 
-          # verify parity on rest of words 
-          for my $dword (3..10) {
-            print "\tDWORD $dword (FIXME unparsed yet) = ";
-            get_30bits;
-            my ($dword_data) = parse_30bit(24);
-            say "\t    $dword_data";
-          }
+        given ($HOW_subframe_ID) {
+            when (2) {				# subframe 2 (Ephemeris data)
+                my Readonly %subframe_format; 
+                tie %subframe_format, 'Tie::IxHash', (
+                    IODE => 8,
+                    Crs => 16,
+                    delta_n => 16,
+                    M0 => 8+24,
+                    Cuc => 16,
+                    e => 8+24,
+                    Cus => 16,
+                    sqrt_A => 8+24,
+                    toe => 16, 
+                    fit_interval => 1,
+                    AODO => 5,
+                    parity_fix => 2
+                );
+                parse_subframe_data_words_3_10 (\%subframe_format);
+                
+            } 
+              
+            when (3) {				# subframe 3 (Ephemeris data)
+                my Readonly %subframe_format; 
+                tie %subframe_format, 'Tie::IxHash', (
+                    Cic => 16,
+                    OMEGA0 => 8+24,
+                    Cis => 16,
+                    i0 => 8+24,
+                    Crc => 16,
+                    omega => 8+24,
+                    OMEGA_DOT => 24,
+                    IODE => 8,
+                    IDOT => 14,
+                    parity_fix => 2
+                );
+                parse_subframe_data_words_3_10 (\%subframe_format);
+            }
+                
+            default {				# FIXME - all other subframes not parsed yet. 
+              # verify parity on rest of words 
+              for my $dword (3..10) {
+                print "\tDWORD $dword (FIXME unparsed yet) = ";
+                get_30bits;
+                my ($dword_data) = parse_30bit(24);
+                say "\t    $dword_data";
+            }
         }
         
         
@@ -562,7 +566,7 @@ while (<>) {
         }    
           
     } elsif ($LEAD_IN =~ /^85..$/) {
-        say "$time$msec LEAD-IN of 0x$LEAD_IN is (sometimes multiple) part of SiRFbinary MID 8 (0x08) - 50 BPS data subframe, extract leap-second from this (FIXME - more parsing if we need it)";
+        say "$time$msec LEAD-IN of 0x$LEAD_IN is (sometimes multiple) part of SiRFbinary MID 8 (0x08) - 50 BPS data subframe, extract leap-second from this";
         # FIXME http://www.navipedia.net/index.php/GPS_Navigation_Message
         # and http://en.wikipedia.org/wiki/GPS_signals#Navigation_message
         # L1 C/A -- The current “legacy” Navigation Message (NAV) is modulated on both carriers at 50 bps. The whole message contains 25 pages (or ’frames’) of 30 seconds each, forming the master frame that takes 12,5 minutes to be transmitted. Every frame is subdivided into 5 sub-frames of 6 seconds each; in turn, every sub-frame consists of 10 words, with 30 bits per word (see figure 3). Every sub-frame always starts with the telemetry word (TLM), which is necessary for synchronism. Next, the transference word (HOW) appears. This word provides time information (seconds of the GPS week), allowing the receiver to acquire the week-long P(Y)-code segment. 
