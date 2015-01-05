@@ -259,6 +259,11 @@ sub parse_50bps_subframe() {
                 #say "\tvalue=$ret{$key}";
             }
             if ($count != 192) { die "invalid number of data bits used $count != 192" }
+
+            if ($parity_failed) {
+                say parsed_raw "\t  parity has failed, aborting data parsing.";
+                return;
+            }
             
             print "\tSUBFRAME PARSED: ";
             foreach my $key (keys %ret) {
