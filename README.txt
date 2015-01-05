@@ -187,8 +187,11 @@ A0A2 00  03F4 00A3 0014 CB5A 8E 02 03 01 43 03 71 00 00 00 00 00 00 00 00 00 00 
   # lsof | grep /dev/ttySAC1      # determine PID of system_server (2029) and FD of GPS device (275)
   system_se  2029     system  275       ???                ???       ???        ??? /dev/ttySAC1
 
-  # sh -c "nohup strace -e trace=open,read -e read=275 -tt -v -ff -o strace.log -xx -s 1 -p 2029 &"
-  # (replace read with write to get logging out output. It should be possible to specify both, but doesn't seem to work in strace 4.6 on on my cyanogenmod9)
+  # sh -c "nohup strace -e trace=open,read,write -e read=275 -e write=275 -tt -v -ff -o strace.log -xx -s 1 -p 2029 &"
+  # (Note: it will only hexlog reads to 275. It should also log writes, but doesn't seem to work in strace 4.6 on on my cyanogenmod9. remove "-e read=275" to get write command logging
+
+  # it could be automated with (make sure GPS app is strarted BEFORE!):
+  lsof | awk '/ttySAC1/ {print "sh -c \"nohup strace -e trace=open,read,write -tt -ff -xx -s 1 -o strace.log -p",  $2, "-e read=" $4, "-e write=" $4, "&\""}' | sh
 
   # (close your GPS app after some time and "killall strace")
 
