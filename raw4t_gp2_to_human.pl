@@ -172,6 +172,7 @@ sub parse_50bps_subframe() {
         our $old_D30 = '0';	# needed for (32,26) Hamming Code parity calculation
         our $word_count = 1;	# number of 30-bit words which have already been read
         our $inverted_preamble = 0;	# if preamble is inverted, need to invert all bits in subframe!
+        our $parity_failed = 0;	# set if parity has failed -- we should discard whole subframe as any data in it is unreliable
         
         sub get_30bits() {	# returns 30 bits dword
             die "data remaining in b30=$b30_dword, and should be empty!" if length($b30_dword) != 0;
@@ -233,7 +234,12 @@ sub parse_50bps_subframe() {
             my $verify_parity = next_x_bits(6);
             die "did not parse all 30 bits: $count" if $count != 30;
             my $calc_parity = calc_parity(join('',@ret) . $verify_parity);
-            say "\t   (parity " . (($calc_parity eq $verify_parity) ? "is valid $verify_parity)":"check HAS FAILED - $calc_parity should be $verify_parity !)");
+            if ($calc_parity eq $verify_parity) {
+                say "\t   (parity is valid $verify_parity)";
+            } else {
+                $parity_failed = 1;
+                say "\t   (parity check HAS FAILED - $calc_parity should be $verify_parity !)";
+            }
             return @ret;
         }
             
@@ -268,7 +274,11 @@ sub parse_50bps_subframe() {
         my ($TLM_preamble, $TLM_message, $TLM_integrity, $TLM_reserver) = parse_30bit (8,14,1,1);
         say "\t   preamble=$TLM_preamble extra_integrity=$TLM_integrity";
         if ($TLM_preamble ne '10001011') {
-            say parsed_raw "\t  INVALID TLM PREAMBLE (Should be 10001011). Remaining 50Bps raw 30-bit words are: " . "\n\t  %X %X %X %X"x9;
+            say parsed_raw "\t  INVALID TLM PREAMBLE (Should be 10001011), aborting subframe processing. Remaining 50Bps raw 30-bit words are: " . "\n\t  %X %X %X %X"x9;
+            return;
+        }
+        if ($parity_failed) {
+            say parsed_raw "\t  TLM parity failed, aborting subframe processing. Remaining 50Bps raw 30-bit words are: " . "\n\t  %X %X %X %X"x9;
             return;
         }
         
@@ -278,6 +288,11 @@ sub parse_50bps_subframe() {
         my ($TOW_trunc, $HOW_alert, $HOW_antispoof, $HOW_subframe_ID, $HOW_parityfix) = parse_30bit (17,1,1,3,2);
         $TOW_trunc = bin2dec($TOW_trunc); $HOW_subframe_ID=bin2dec($HOW_subframe_ID);	# convert to decimal instead of binary
         say "\t   TOW=$TOW_trunc alert=$HOW_alert antispoof=$HOW_antispoof subframe_ID=$HOW_subframe_ID";
+        if ($parity_failed) {
+            say parsed_raw "\t  HOW parity failed, aborting subframe processing. Remaining 50Bps raw 30-bit words are: " . "\n\t  %X %X %X %X"x8;
+            return;
+        }
+
         
         # FIMXE we should parse depending on subpage only if TLM/HOW passed sanity/parity checks...
         if ($HOW_subframe_ID == 2) {			# subframe 2 (Ephemeris data)
