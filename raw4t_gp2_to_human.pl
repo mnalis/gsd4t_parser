@@ -235,7 +235,7 @@ sub parse_50bps_subframe() {
             die "did not parse all 30 bits: $count" if $count != 30;
             my $calc_parity = calc_parity(join('',@ret) . $verify_parity);
             if ($calc_parity eq $verify_parity) {
-                say "\t   (parity is valid $verify_parity)";
+#                say "\t   (parity is valid $verify_parity)";
             } else {
                 $parity_failed = 1;
                 say "\t   (parity check HAS FAILED - $calc_parity should be $verify_parity !)";
