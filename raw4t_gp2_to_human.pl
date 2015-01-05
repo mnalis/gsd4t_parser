@@ -267,6 +267,7 @@ sub parse_50bps_subframe() {
             
             print "\tSUBFRAME PARSED: ";
             foreach my $key (keys %ret) {
+                next if $key =~ /DELME/;	# skip uninteresting keys
                 print "$key=$ret{$key} ";
             }
             say '.';
@@ -311,17 +312,17 @@ sub parse_50bps_subframe() {
                     SV_health => 6,
                     IODC_MSB => 2,
                     L2_P => 1, 
-                    reserved1 => 23, 
-                    reserved2 => 24,
-                    reserved3 => 24, 
-                    reserved4 => 16,
+                    reserved1_DELME => 23, 
+                    reserved2_DELME => 24,
+                    reserved3_DELME => 24, 
+                    reserved4_DELME => 16,
                     Tgd => 8,
                     IODC_LSB => 8,
                     t_oc => 16,
                     a_f2 => 8,
                     a_f1 => 16,
                     a_f0 => 22,
-                    parity_fix => 2
+                    parity_fix_DELME => 2
                 );
                 parse_subframe_data_words_3_10 (\%subframe_format);
             }
@@ -340,7 +341,7 @@ sub parse_50bps_subframe() {
                     toe => 16, 
                     fit_interval => 1,
                     AODO => 5,
-                    parity_fix => 2
+                    parity_fix_DELME => 2
                 );
                 parse_subframe_data_words_3_10 (\%subframe_format);
             } 
@@ -357,7 +358,7 @@ sub parse_50bps_subframe() {
                     OMEGA_DOT => 24,
                     IODE => 8,
                     IDOT => 14,
-                    parity_fix => 2
+                    parity_fix_DELME => 2
                 );
                 parse_subframe_data_words_3_10 (\%subframe_format);
             }
@@ -591,7 +592,7 @@ while (<>) {
         }    
           
     } elsif ($LEAD_IN =~ /^85..$/) {
-        say "$time$msec LEAD-IN of 0x$LEAD_IN is (sometimes multiple) part of SiRFbinary MID 8 (0x08) - 50 BPS data subframe, extract leap-second from this";
+        say "$time$msec LEAD-IN of 0x$LEAD_IN is (sometimes multiple) part of SiRFbinary MID 8 (0x08) - 50 BPS data subframe, FIXME extract leap-second from this";
         # FIXME http://www.navipedia.net/index.php/GPS_Navigation_Message
         # and http://en.wikipedia.org/wiki/GPS_signals#Navigation_message
         # L1 C/A -- The current “legacy” Navigation Message (NAV) is modulated on both carriers at 50 bps. The whole message contains 25 pages (or ’frames’) of 30 seconds each, forming the master frame that takes 12,5 minutes to be transmitted. Every frame is subdivided into 5 sub-frames of 6 seconds each; in turn, every sub-frame consists of 10 words, with 30 bits per word (see figure 3). Every sub-frame always starts with the telemetry word (TLM), which is necessary for synchronism. Next, the transference word (HOW) appears. This word provides time information (seconds of the GPS week), allowing the receiver to acquire the week-long P(Y)-code segment. 
