@@ -1,0 +1,17 @@
+- finish parsing 50bps data (to look for Ephemeris data)
+
+- why does 50BPS data (both in raw GSD4t data from strace.log, and more
+  importantly from Samsung-generated SLCLog.gp2 MID 08) seems broken most of
+  the time (TLM is invalid, parity does not verify etc)?
+
+- if we had ephemeris (either from 50BPS data, or downloaded from Internet
+  AGPS way), what else would we need to calculate satellite pseudorange?
+  The time of transmission? Find where that can be acquired from (first from 
+  raw GPS communication - 50BPS data or something else?), and then try to find
+  it SLCLog.gp2 and finally in raw GSD4t datastream.
+
+- when we have calculated SV pseudoranges, we can proceed to trilaterate our
+  position in ECEF, and from there convert to WGS84 lat/lon/height coordinates.
+
+- find what other unknown bits mean and if they can be used for better
+  precision, faster fix etc.
