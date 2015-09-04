@@ -1,15 +1,118 @@
-SLCLog.gp2:
+------------------------- SLCLog.gp2 -------------------------
 # position response?
-16:21:46.509 skip unknown MID 0x45 -- hex 01 00 01 00 01 01 00 07 06 0D 61 F3 32 3E 2F BE 91 0B 3C 37 20 1F D3 86 86 15 A9 81 00 03 B2 A6 00 BE 34 1A 16 00 33 37 6B E8 00 0F 05 1D 25 31 15 18 00 02 13 42 19 11 45 0E 10 4C 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+16:21:46.509 skip unknown MID 0x45 (MID 69, SID 1) -- hex 01 00 01 00 01 01 00 07 06 0D 61 F3 32 3E 2F BE 91 0B 3C 37 20 1F D3 86 86 15 A9 81 00 03 B2 A6 00 BE 34 1A 16 00 33 37 6B E8 00 0F 05 1D 25 31 15 18 00 02 13 42 19 11 45 0E 10 4C 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+	01		- SID MID_POS_MEAS_RESP
+	00 		- POS_REQ_ID
+	01		- POS_RESULTS_FLAG 		(0x01 = "some fields in the position result section are valid")
+	00 		- POSITION_ERROR_ STATUS 	(0x00 = "position information is delivered. POSITION MAIN SECTION is valid, plus other optional fields")
+	01		- POS_ACC_MET			(0x01 = horizontal error as well as vertical error in the position are estimated to be respectively less (more) than the maximum requested horizontal error and maximum requested vertical error with a confidence level of 95%")
+
+	; position main section
+	01		- POS_TYPE			(0x01 = 3D fix)
+	00		- DGPS_COR			(0x00 = No DGPS correction)
+	07 06		- MEAS_GPS_WEEK			? 0x0706 = 1798
+	0D 61 F3 32	- MEAS_GPS_SECONDS		? 0x0D61F332 = 224523058 (in 1/1000 of second - from 0s to 604,799.999 seconds.)
+	3E 2F BE 91	- MEAS_LAT			(0x3E2FBE91 = Lat. 1043316369)
+	0B 3C 37 20	- MEAS_LONG			(0x0B3C3720 = Lon. 188495648)
+	1F		- OTHER SECTIONS		0x1F = (bitmapped, all sections valid: Horizontal Error Section, Vertical Position Section, Velocity Section, Clock Correction Section, Position Correction Section)
+	  
+	; horizontal error section
+	D3 		- ER_EL_ANG
+	86		- MAJ_STD_ER
+	86		- MIN_STD_ER
+	
+	; vertical error section
+	15 A9		- HEIGHT
+	81		- HEIGHT_STD_ER
+	
+	; velocity section
+	00 03		- HOR_VEL
+	B2 A6		- HEADING
+	00		- VER_VEL
+	BE		- VEL_ER_EL_ANG
+	34		- VEL_MAJ_STD_ER
+	1A		- VEL_MIN_STD_ER
+	16		- VER_VEL_STD_ER
+	
+	; clock correction section
+	00		- TIME_REF
+	33 37		- CLK_BIAS
+	6B E8		- CLK_DRIFT
+	00		- CLK_STD_ER
+	0F		- UTC_OFF
+	
+	; position correction section
+	05 		- NB_SV (number of correct SV  that follow)
+	
+	1D 		sv00 - SV_PRN
+	25 		sv00 - C_N0
+	31		sv00 - INV_WEIGHTS floating point (4bit X=exponent, 4bit Y=matissa)?
+	  
+
+	15 18 00	... sv01 (INV_WEIGHTS=0 ==> this sattelite not used in fix!)
+	02 13 42	... sv02
+	19 11 45	... sv03
+	0E 10 4C 	... sv04
+	
+	00 00 00	... invalid SVs here and below (there are always 16 of them listed; but only NB_SV are valid)
+	00 00 00
+	00 00 00
+	00 00 00
+	00 00 00
+	00 00 00
+	00 00 00
+	00 00 00
+	00 00 00
+	00 00 00
+	00 00 00
+
 # measeurements response?
-16:21:46.511 skip unknown MID 0x45 -- hex 02 00 01 04 00 00 00 00 00 00 00 00
+16:21:46.511 skip unknown MID 0x45 (MID 69, SID 2) -- hex 02 00 01 04 00 00 00 00 00 00 00 00
+	02		- SID MID_POS_MEAS_RESP
+	00		- POS_REQ_ID
+	01 		- GPS_MEAS_FLAG
+	04		- MEAS_ERROR_STATUS -- error, all other data invalid. 0x04 = reserved!
+	00 00		- MEAS_GPS_WEEK
+	00 00 00 00	- MEAS_GPS_SECONDS
+	00 		- TIME_ACCURACY
+	00		- NUM_SVS
 
 
-DetailedLog.txt:
+------------------------- DetailedLog.txt -------------------------
 <2014:06:24:16:21:46> GPS -> SET :OSP_POSITION_RESPONSE 00 01 00 01 01 00 06 07 32 f3 61 0d 91 be 2f 3e 20 37 3c 0b 1f d3 86 86 a9 15 81 00 03 00 a6 b2 00 be 34 1a 16 00 37 33 e8 6b 00 0f 05 1d 25 31 15 18 00 02 13 42 19 11 45 0e 10 4c 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	00 01 00 01 01 00 06 07 32 f3 61 0d	?
+	91 be 2f 3e 				- Lat!
+	20 37 3c 0b				- Lon!
+	1f d3 					?
+	86 86 					- hor_error_major, hor_error_minor ?
+	a9 15 					- Alt!
+	81 00 03 00 				? (maybe part of that is: horizontalVelocity 3, verticalVelocity 0?)
+	a6 b2 					- Heading 45734
+	00 be 34 1a 16 00 37 33 e8 6b 00 0f 	?
+	05 					- number of visible SVs?
+	1d 25 31				- (sv00) PRN=29 C/N0=37 INV_WEIGTH=49
+	15 18 00				- (sv01) PRN=21 C/N0=24 INV_WEIGTH=0
+	02 13 42				- (sv02) PRN=02 C/N0=19 INV_WEIGTH=66
+	19 11 45				- (sv03) PRN=25 C/N0=17 INV_WEIGTH=69
+	0e 10 4c				- (sv04) PRN=14 C/N0=16 INV_WEIGTH=76
+	00 00 00				- unused sv05
+	00 00 00				- unused sv06
+	00 00 00				- unused sv07
+	00 00 00				- unused sv08
+	00 00 00				- unused sv09
+	00 00 00				- unused sv10
+	00 00 00				- unused sv11
+	00 00 00				- unused sv12
+	00 00 00				- unused sv13
+	00 00 00				- unused sv14
+	00 00 00				- unused sv15
+	00 00 00 				- ?
+
 <2014:06:24:16:21:46> GPS -> SET :OSP_MEASURE_RESPONSE 00 01 04 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 
-sirf_interface_log.txt:
+
+------------------------- sirf_interface_log.txt -------------------------
 <16:21:46> ##### TTFF : 26 second #####
 <16:21:46> INFO: (lsmLocCallback) rcvedNumOfFixes/numFixes = 148/0
 <16:21:46> INFO: lsmLocCallback : do nothing
@@ -19,7 +122,9 @@ sirf_interface_log.txt:
 <16:21:46> Position Fix (148 of 0) : Latitude 43.724884   Longtitude 15.799523
 <16:21:46> LSM:lsmLocCB out
 
-BriefLog.txt:
+
+
+------------------------- BriefLog.txt -------------------------
 <2014:06:24:16:21:46> OSP POSITION
 <2014:06:24:16:21:46> GPS -> SET :OSP POSITION RESPONSE
 <2014:06:24:16:21:46> The Horizontal Uncertainity of position = 124
@@ -40,7 +145,7 @@ BriefLog.txt:
 	Lat: 1043316369	0x(3E 2F BE 91) -- found in DetailedLog.txt OSP_POSITION_RESPONSE as 0x(91 be 2f 3e)
 	Lon: 188495648	0x(0B 3C 37 20) -- found in DetailedLog.txt OSP_POSITION_RESPONSE as 0x(20 37 3c 0b)
 	Alt: 5545	0x(15 A9)	-- found in DetailedLog.txt OSP_POSITION_RESPONSE as 0x(a9 15)
-<2014:06:24:16:21:46> INFO: Output the default location method, Location method not intiialized
+<2014:06:24:16:21:46> INFO: Output the default location method, Location method not initialized
 <2014:06:24:16:21:46> INFO in OSP resp: hor_err_major = 0x86
 <2014:06:24:16:21:46> INFO in OSP resp: hor_err_minor = 0x86
 <2014:06:24:16:21:46> INFO in OSP resp: velocity_ver_err = 0x16

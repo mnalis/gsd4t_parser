@@ -5,40 +5,94 @@
 #### This one packet causes all that stuff down! ###
 16:21:40.138 currently unsupported LEAD-IN 843B: 00/00/0006 16:21:40.138 (0) 
 
-84 3B 00 00 00 00 04 B5 C7 20 00 03 6C FE 37 FD 02 C4 00 00 EE 20 00 00 00 03 00 55 05 DC 00 00 16 A8 07 06 03 00 00 0B 00
-7E 00 00 00 00 05 AF 2D A1 04 00 1D 00 02 BD 
+? 84 3B 00 
+? 00 00 00 04 -- might be increasing (or same) counter of some sort?
+? B5 C7 20 00 03 6C FE 37 FD 02 C4 00 00 EE 20 00 00 00 03 00 55 05 DC 00 00 16 A8 07 06 03 00 00 0B 00 7E 00 00 00 00 05 AF 2D A1 04 00 
 
-05 AD 69 B2 -- match, but last byte-1
-D6 B4 D9 15 ED BF 22 77 0B F9 E9 D9 00 03 00 0A 00 AB 4A EA 00 00 00 6F 00 01 BC -- match
-00 00 00 00 00 00 00   -- double zeroes
-39 00 FF 03 01 CA 00 D0 -- match
++ 1D -- match, SVID!
+? 00 02 BD 
++ 05 AD 69 B2 -- match, but last byte-1
++ D6 B4 D9 15 ED BF 22 77 0B F9 E9 D9 00 03 00 0A 00 AB 4A EA 00 00 00 6F 00 01 BC -- match
++ 00 00 00 00 00 00 00   -- double zeroes
++ 39 00 FF 03 01 CA 00 D0 -- match
+? 00 00 00 00 00 14 3C 03 
++ 0A - number of following entries?
+  01 72 
+  01 72
+  01 72
+  01 72 
+  01 73 
+  01 72 
+  01 72 
+  01 72 
+  01 72 
+  01 72 
++ 02 54 00 34 00 AB 4A 64 00 04 00 00
+? 01 01 00 
 
-00 00 00 00 00 14 3C 03 0A 01 72 01 72 01 72 01 72 01 73 01 72 01 72 01 72 01 72 01 72 02 54 00 34 00 AB 4A 64 00 04 00 00
-01 01 00 02 00 04 AD 
++ 02  -- match, SVID!
+? 00 04 AD
++ 05 AD 99 6E -- match, but last byte-1
++ D6 CC B7 45 AF 3E 38 22 0C 51 0B 7D 00 02 00 00 00 AB 4A EA FF FF FF 75 FF FD D4 -- match
++ 00 00 00 00 00 00 00  -- double zeroes
++ 39 00 FF D4 FE FD 00 1B -- match
+? 00 00 00 03 32 09 B0 06
++ 0A - number of following entries?
+  00 BF
+  00 BF
+  00 C0
+  00 C1
+  00 C1
+  00 C0
+  00 C1
+  00 C1
+  00 C0
+  00 BF
++ 00 DE 00 DA 00 00 00 00 00 00 00 00 
+? 01 01 00 
 
-05 AD 99 6E -- match, but last byte-1
-D6 CC B7 45 AF 3E 38 22 0C 51 0B 7D 00 02 00 00 00 AB 4A EA FF FF FF 75 FF FD D4 -- match
-00 00 00 00 00 00 00  -- double zeroes
-39 00 FF D4 FE FD 00 1B -- match
++ 0E  -- match, SVID!
+? 00 04 EC 
++ 05 AD A4 11  -- match, but last byte-1
++ D6 D2 08 CA A4 60 D4 6D 0C 61 6A F9 00 0B 00 0F 00 AB 4A E9 FF FF FF CF FF FF 3C -- match
++ 00 00 00 00 00 00 00   -- double zeroes
++ 39 00 FC 0C 0C 1E 00 11 -- match
+? 00 00 00 01 32 08 E8 04
++ 0A - number of following entries?
+  00 A2
+  00 A2
+  00 A3
+  00 A3
+  00 A4
+  00 A7
+  00 A6
+  00 A6
+  00 A4
+  00 A2
++ 01 0D 00 B1 00 00 00 00 00 02 00 00 
+? 01 00 00 
 
-00 00 00 03 32 09 B0 06 0A 00 BF 00 BF 00 C0 00 C1 00 C1 00 C0 00 C1 00 C1 00 C0 00 BF
-00 DE 00 DA 00 00 00 00 00 00 00 00 01 01 00 0E 00 04 EC 
 
-05 AD A4 11  -- match, but last byte-1
-D6 D2 08 CA A4 60 D4 6D 0C 61 6A F9 00 0B 00 0F 00 AB 4A E9 FF FF FF CF FF FF 3C -- match
-00 00 00 00 00 00 00   -- double zeroes
-39 00 FC 0C 0C 1E 00 11 -- match
-
-00 00 00 01 32 08 E8 04 0A 00 A2 00 A2 00 A3 00 A3
-00 A4 00 A7 00 A6 00 A6 00 A4 00 A2 01 0D 00 B1 00 00 00 00 00 02 00 00 01 00 00 15 00 04 2D 
-
-05 AD 79 B1 -- match, but last byte-1
-D6 BC D8 D0 A7 CC 41 B4 0B 9D 2D F2 FF FF 00 12 00 AB 4A E9 00 00 00 35 00 00 D4 -- match
-00 00 00 00 00 00 00    -- double zeroes
-39 00 00 46 03 E3 FF E8 -- match
-
- 00 00 00 04 32
-0F 78 01 0A 00 F5 00 F4 00 F5 00 F5 00 F5 00 F5 00 F5 00 F5 00 F5 00 F5 00 B2 01 7B 00 AB 4A 64 00 00 00 00 01 01 00 
++ 15  -- match, SVID!
+? 00 04 2D 
++ 05 AD 79 B1 -- match, but last byte-1
++ D6 BC D8 D0 A7 CC 41 B4 0B 9D 2D F2 FF FF 00 12 00 AB 4A E9 00 00 00 35 00 00 D4 -- match
++ 00 00 00 00 00 00 00    -- double zeroes
++ 39 00 00 46 03 E3 FF E8 -- match
+? 00 00 00 04 32 0F 78 01
++ 0A - number of following entries?
+  00 F5
+  00 F4
+  00 F5
+  00 F5
+  00 F5
+  00 F5
+  00 F5
+  00 F5
+  00 F5
+  00 F5
++ 00 B2 01 7B 00 AB 4A 64 00 00 00 00 
+? 01 01 00 
 # seq1=00BE seq2=000C len=01AC
 
 
@@ -52,34 +106,53 @@ D6 BC D8 D0 A7 CC 41 B4 0B 9D 2D F2 FF FF 00 12 00 AB 4A E9 00 00 00 35 00 00 D4
 16:21:40.147 GPSD knows MID 0x1C --  (unused debug) (len should be 0x38) Navigation Library Measurement Data MID 28 -- hex 01 05 AD 99 6E 02 10 F5 39 9F 41 0B 68 26 06 95 43 DB 41 76 61 F6 46 92 55 52 5F 65 79 2C 41 76 61 F4 09 B0 AD 13 13 13 13 13 13 13 13 13 13 00 00 00 00 00 00 32 00
 16:21:40.148 GPSD knows MID 0x1C --  (unused debug) (len should be 0x38) Navigation Library Measurement Data MID 28 -- hex 03 05 AD 99 6E 15 10 F5 39 9F 41 0B 68 26 C0 DD 2B F5 41 76 D0 03 46 89 FC 77 62 39 35 F4 41 76 D0 04 0F 78 2D 19 19 19 19 19 19 19 19 19 18 00 00 00 00 00 00 32 00
 
-16:21:40.149 GPSD knows MID 0x40 --  Nav Library MID 64 -- hex 02 1D 10 02 00 
-05 AD 69 B3 
-D6 B4 D9 15 ED BF 22 77 0B F9 E9 D9 00 03 00 0A 00 AB 4A EA 00 00 00 6F 00 01 BC
-00 00 00 
-39 00 FF 03 01 CA 00 D0
-00 00 02 54 00 34 00 AB 4A 64 00 04 00 00 00 00 00 00 04
+16:21:40.149 GPSD knows MID 0x40 --  Nav Library MID 64 -- SID 02, hex 
++ 1D - SVID
+? 10 02 00 
++ 05 AD 69 B3 
++ D6 B4 D9 15 ED BF 22 77 0B F9 E9 D9 00 03 00 0A 00 AB 4A EA 00 00 00 6F 00 01 BC
++ 00 00 00 
++ 39 00 FF 03 01 CA 00 D0
+? 00 00 
++ 02 54 00 34 00 AB 4A 64 00 04 00 00 
+? 00 
+? 00 00 00 04
 
-16:21:40.149 GPSD knows MID 0x40 --  Nav Library MID 64 -- hex 02 02 10 04 00 
-05 AD 99 6F 
-D6 CC B7 45 AF 3E 38 22 0C 51 0B 7D 00 02 00 00 00 AB 4A EA FF FF FF 75 FF FD D4
-00 00 00 
-39 00 FF D4 FE FD 00 1B 
-00 00 00 DE 00 DA 00 00 00 00 00 00 00 00 00 00 00 00 04
+16:21:40.149 GPSD knows MID 0x40 --  Nav Library MID 64 -- SID 02, hex 
++ 02 - SVID
+? 10 04 00 
++ 05 AD 99 6F 
++ D6 CC B7 45 AF 3E 38 22 0C 51 0B 7D 00 02 00 00 00 AB 4A EA FF FF FF 75 FF FD D4
++ 00 00 00 
++ 39 00 FF D4 FE FD 00 1B 
+? 00 00
++ 00 DE 00 DA 00 00 00 00 00 00 00 00 
+? 00 
+? 00 00 00 04
 
-16:21:40.150 GPSD knows MID 0x40 --  Nav Library MID 64 -- hex 02 0E 00 04 00 
-05 AD A4 12
-D6 D2 08 CA A4 60 D4 6D 0C 61 6A F9 00 0B 00 0F 00 AB 4A E9 FF FF FF CF FF FF 3C
-00 00 00 
-39 00 FC 0C 0C 1E 00 11
-00 00 01 0D 00 B1 00 00 00 00 00 02 00 00 00 00 00 00 04
+16:21:40.150 GPSD knows MID 0x40 --  Nav Library MID 64 -- SID 02, hex 
++ 0E - SVID
+? 00 04 00 
++ 05 AD A4 12
++ D6 D2 08 CA A4 60 D4 6D 0C 61 6A F9 00 0B 00 0F 00 AB 4A E9 FF FF FF CF FF FF 3C
++ 00 00 00 
++ 39 00 FC 0C 0C 1E 00 11
+? 00 00 
++ 01 0D 00 B1 00 00 00 00 00 02 00 00 
+? 00 
+? 00 00 00 04
 
-16:21:40.151 GPSD knows MID 0x40 --  Nav Library MID 64 -- hex 02 15 10 04 00
-05 AD 79 B2 
-D6 BC D8 D0 A7 CC 41 B4 0B 9D 2D F2 FF FF 00 12 00 AB 4A E9 00 00 00 35 00 00 D4
-00 00 00 
-39 00 00 46 03 E3 FF E8
-00 00 00 B2 01 7B 00 AB 4A 64 00 00 00 00 00 00 00 00 04
-
+16:21:40.151 GPSD knows MID 0x40 --  Nav Library MID 64 -- SID 02, hex 
++ 15 - SVID
+? 10 04 00
++ 05 AD 79 B2 
++ D6 BC D8 D0 A7 CC 41 B4 0B 9D 2D F2 FF FF 00 12 00 AB 4A E9 00 00 00 35 00 00 D4
++ 00 00 00 
++ 39 00 00 46 03 E3 FF E8
+? 00 00 
++ 00 B2 01 7B 00 AB 4A 64 00 00 00 00 
+? 00 
+? 00 00 00 04
 
 16:21:40.152 DEBUG TEXT(FF): NLC:   29    2    0   21    0    0    0    0    0    0    0    0%
 16:21:40.153 DEBUG TEXT(FF): NLD:   bd   ad    0   2d    0    0    0    0    0    0    0    0

@@ -50,10 +50,11 @@ while (<>) {
 
     my $date = $1; my $time = $2; my $msec=$3; 
     my @data = split ' ', $4;
+    my $extra = '';
 
 #### byte 0 (always 00) ####
     my $p_lead_zero = shift @data; 
-    if ($p_lead_zero ne '00') { warn "# WARNING: leading zero not 00 but $p_lead_zero in $_" }
+    if ($p_lead_zero ne '00') { warn "# WARNING: leading zero not 00 but $p_lead_zero in $_"; $extra .= " (WARNING: leading zero was not 00 but $p_lead_zero)" }
     print "  leading 00 -- OK\n" if $DEBUG > 7;
 
 #### byte 1-2 (sequence1) ####
@@ -107,7 +108,7 @@ while (<>) {
     my $cnt = $length;
     while ($cnt--) {
       my $byte = shift @data;
-      if (!defined $byte) { die "not enough payload: need $cnt more in $_" }
+      if (!defined $byte) { die "not enough payload: need $cnt more in $_" }	# FIXME: dies sometimes  (see gsd4t_logs/strace4/strace.log.3491.parsed.txt)
       $p_payload .= "$byte ";
     }
     print "  payload ==> $p_payload\n" if $DEBUG > 7;
@@ -126,7 +127,7 @@ while (<>) {
 
 
     print "00/00/0006 $time$msec (0) ${p_payload}";
-    print "\t# seq1=$p_seq1 seq2=$p_seq2 len=$p_length" if $DEBUG > 1;
+    print "\t# seq1=$p_seq1 seq2=$p_seq2 len=$p_length$extra" if $DEBUG > 1;
     print "\n";
 
   } else {

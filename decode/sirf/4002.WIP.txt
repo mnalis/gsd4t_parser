@@ -1,0 +1,39 @@
+16:21:40.149 GPSD knows MID 0x40 --  Nav Library MID 64 -- hex 02 1D 10 02 00 
+05 AD 69 B3 
+D6 B4 D9 15 ED BF 22 77 0B F9 E9 D9 00 03 00 0A 00 AB 4A EA 00 00 00 6F 00 01 BC
+00 00 00 
+39 00 FF 03 01 CA 00 D0
+00 00 02 54 00 34 00 AB 4A 64 00 04 00 00 00 00 00 00 04
+
+
+# note: lines beggining with "+" we have in raw GSD4t data!
+
+02 -- Navigation Library (NL) Auxiliary Measurement Data - Message ID 64, Sub ID 2
++	1D 		- SVID 29
+	10		- General Tracker Status (0x10 = Multipath detected)
+?	02		- Tracker Channel Status (0x02 = False Lock (not implemented)?)
+	00		- Bit Sync Quality
++	05 AD 69 B3	- Time Tag
++	D6 B4 D9 15 	- Code Phase
++	ED BF 22 77 	- Carrier Phase
++	0B F9 E9 D9 	- Carrier Frequency
++	00 03		- Carrier Acceleration
++	00 0A		- Millisecond number
++	00 AB 4A EA	- Bit number
++	00 00 00 6F 	- Code corrections
++	00 01 BC 00	- Smoothed code
++	00 00 39 00	- Code offset
++	FF 03		- Pseudorange Noise
++	01 CA		- Delta Range Quality
++ 	00 D0		- Phase Lock Quality 
+	00 00		- Milliseconds uncertainty (not implemented)
++	02 54		- Sum Abs I
++	00 34		- Sum Abs Q
++	00 AB 4A 64	- SV Bit Number
++	00 04		- Mpath LOS Det Value
++	00 00		- Mpath Only Det Value
+	00		- Recovery Status
+	00 00 00 04	- SW Time Uncertainty
+	
+
+
