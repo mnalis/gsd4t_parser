@@ -1,0 +1,14 @@
+
+- google SiRFNav / SiRFNavIV (gps.exnos4.so), SiRFstarIV Host Interface
+  (to je taj unknown binary protokol!)
+
+
+- put gps-kit-cvs to github, and extract more human readable info to  data/strace6/SLC*
+  (preuredi sirfdump da koristi SLCLog.gp2 format, i da ispisuje i hex i opis
+
+- The GSD4t is a tracker. The GPS function is split between it and the host processor-based GPS software.
+The GSD4t tracker portion of the software provides GPS status, range measurements and demodulated GPS
+satellite data to the host-based software.
+The GPS software running on the host provides commands and initialization data to the GSD4t and GPS navigation
+data at a 1Hz output rate to the user host software.
+
