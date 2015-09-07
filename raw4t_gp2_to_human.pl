@@ -594,6 +594,7 @@ while (<>) {
           
     } elsif ($LEAD_IN =~ /^85..$/) {
         say "$time$msec LEAD-IN of 0x$LEAD_IN is (sometimes multiple) part of SiRFbinary MID 8 (0x08) - 50 BPS data subframe, FIXME extract leap-second from this";
+        say "    (debug) all MID8 data: @data";
         # FIXME http://www.navipedia.net/index.php/GPS_Navigation_Message
         # and http://en.wikipedia.org/wiki/GPS_signals#Navigation_message
         # L1 C/A -- The current “legacy” Navigation Message (NAV) is modulated on both carriers at 50 bps. The whole message contains 25 pages (or ’frames’) of 30 seconds each, forming the master frame that takes 12,5 minutes to be transmitted. Every frame is subdivided into 5 sub-frames of 6 seconds each; in turn, every sub-frame consists of 10 words, with 30 bits per word (see figure 3). Every sub-frame always starts with the telemetry word (TLM), which is necessary for synchronism. Next, the transference word (HOW) appears. This word provides time information (seconds of the GPS week), allowing the receiver to acquire the week-long P(Y)-code segment. 
