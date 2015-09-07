@@ -12,3 +12,17 @@ satellite data to the host-based software.
 The GPS software running on the host provides commands and initialization data to the GSD4t and GPS navigation
 data at a 1Hz output rate to the user host software.
 
+
+
+from fcancillo commented on Feb 4 2015
+https://github.com/mnalis/gsd4t_parser/issues/3
+
+Good morning.
+I just put a repository named RXtoRINEX where there are some tools to collect / convert OSP data to RINEX.
+Although RINEX is not aimed to real time processing, but to post-processing for high accuracy positioning, the important point is that RINEX files contains all data need for computing position solutions. To generate a RINEX observations file from OSP data they are needed MID28 and MID7 to generate epoch data, and MID2, MID6 and MID7 would be useful to get some header data. To generate a RINEX navigation file they are need: a MID15 (complete ephemerides data collected by the receiver) or the MID8 (50 bps GPS message data) for all satellites being tracked.
+The conclusions are:
+• If you only need the position solution computed by the receiver, MID2 provides you X,Y,Z coordinates. Alternatively you have MID41 with latitude, longitude and altitude.
+• If you plan to compute your own solution from GPS data, you should need MID28 (observables for a satellite) for all satellites being tracked, MID7 with the clock corrections, and satellite orbital ephemerides, which can be obtained from MID8 or MID15.
+• If you plan to compute an improved solution, you should need additional data from other sources, like GPS augmentation data provided by a SBAS (WAAS, EGNOS or MSAS), or like NTRIP data being provided by some reference stations networks.
+With regard to data I collected from SiRFIV receivers, from a GSD4e based G-STARIV it was possible to collect all data to generate RINEX files, but from a GSD4t based Samsung Galaxy S2 only observation data were included in the GP2 file.
+May be the above mentioned project contents could by useful for your objectives.
